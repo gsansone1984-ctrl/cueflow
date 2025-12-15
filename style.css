@@ -1,19 +1,22 @@
 :root{
-  --bg:#0b0f17;
-  --panel:#121a2a;
-  --panel2:#0f1625;
-  --text:#e8eefc;
-  --muted:#a9b7d6;
-  --border:rgba(255,255,255,.08);
+  --bg:#000000;
+  --panel:#000000;
+  --panel2:#000000;
+
+  --text:#f2f2f2;
+  --muted:#bdbdbd;
+  --border:rgba(255,255,255,.12);
+
   --primary:#4f7cff;
   --danger:#ff4f6d;
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  background:linear-gradient(180deg,var(--bg),#070a10);
+  background: var(--bg);
   color:var(--text);
 }
 
@@ -22,8 +25,7 @@ body{
   display:flex; align-items:center; justify-content:space-between;
   padding:14px 16px;
   border-bottom:1px solid var(--border);
-  background:rgba(11,15,23,.92);
-  backdrop-filter: blur(10px);
+  background:#000;
   z-index:10;
 }
 
@@ -48,7 +50,7 @@ body{
 }
 
 .panel{
-  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  background:#000;
   border:1px solid var(--border);
   border-radius:16px;
   padding:12px;
@@ -67,14 +69,14 @@ body{
   padding:8px 10px;
   border-radius:12px;
   border:1px solid var(--border);
-  background:rgba(255,255,255,.03);
+  background:rgba(255,255,255,.04);
   color:var(--text);
   cursor:pointer;
   font-size:13px;
 }
 .tab.active{
-  border-color: rgba(79,124,255,.5);
-  background:rgba(79,124,255,.15);
+  border-color: rgba(79,124,255,.55);
+  background:rgba(79,124,255,.20);
 }
 
 textarea{
@@ -84,7 +86,7 @@ textarea{
   padding:12px;
   border-radius:14px;
   border:1px solid var(--border);
-  background:rgba(0,0,0,.15);
+  background:#000;
   color:var(--text);
   outline:none;
   line-height:1.5;
@@ -136,27 +138,41 @@ textarea{
 }
 .control-group label{font-size:12px; color:var(--muted)}
 .control-group input[type="range"]{width:140px}
+
+/* ALIGN SELECT: leggibile */
 .control-group select{
-  background:transparent;
+  background:#000;
   color:var(--text);
-  border:0;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:6px 8px;
   outline:none;
 }
 
-.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color:var(--muted)}
+/* Dropdown options: leggibili */
+.control-group select option{
+  background:#ffffff;
+  color:#000000;
+}
 
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color:var(--muted)
+}
+
+/* Teleprompter window tutta nera */
 .viewer-wrap{
   border:1px solid var(--border);
   border-radius:16px;
   overflow:hidden;
   height: calc(100vh - 190px);
-  background:rgba(0,0,0,.25);
+  background:#000;
 }
-
 .viewer{
   height:100%;
   overflow:hidden;
   position:relative;
+  background:#000;
 }
 
 .content{
@@ -194,12 +210,14 @@ textarea{
   border-bottom:1px solid rgba(255,255,255,.12);
   align-items:center;
   flex-wrap:wrap;
+  background:#000;
 }
 
 .present-view{
   flex:1;
   overflow:hidden;
   position:relative;
+  background:#000;
 }
 
 .present-content{
