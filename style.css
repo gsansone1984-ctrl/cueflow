@@ -592,3 +592,27 @@ body.editor-collapsed .panel.editor .panel-head{ justify-content:center; }
   }
 }
 
+@media (max-width: 1024px){
+  .layout{
+    flex-direction:column !important;
+    overflow:visible !important;
+  }
+
+  #editorPanel, #prompterPanel{
+    width:100% !important;
+    max-width:none !important;
+    margin-left:0 !important;
+  }
+
+  body.mobile-view-edit #editorPanel{ display:flex !important; }
+  body.mobile-view-edit #prompterPanel{ display:none !important; }
+
+  body.mobile-view-prompt #editorPanel{ display:none !important; }
+  body.mobile-view-prompt #prompterPanel{ display:flex !important; }
+
+  /* rende comodo scrivere */
+  #editorPanel .rte{
+    min-height: 65vh !important;
+    font-size: 16px !important;
+  }
+}
