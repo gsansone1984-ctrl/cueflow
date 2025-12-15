@@ -5,8 +5,7 @@
   --border:rgba(255,255,255,.12);
   --danger:#ff4f6d;
 
-  /* GIALLO LOGO */
-  --accent:#FFD400;
+  --accent:#FFD400;   /* giallo logo */
   --accent2:#FFB800;
 
   --chip: rgba(255,255,255,.06);
@@ -14,21 +13,35 @@
 
 *{box-sizing:border-box}
 
+html, body{
+  height:100%;
+}
+
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   background: var(--bg);
   color:var(--text);
+  overflow:hidden; /* importante: layout “app-like” */
 }
 
-/* MIRROR TUTTO IL SITO */
+/* wrapper app */
+#appRoot{
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+/* mirror tutto sito */
 body.site-mirrored #appRoot{
   transform: scaleX(-1);
-  transform-origin: center;
+  transform-origin:center;
 }
 
-/* Topbar */
+/* topbar */
 .topbar{
+  flex:0 0 auto;
   position:sticky; top:0;
   display:flex; align-items:center; justify-content:space-between;
   padding:14px 16px;
@@ -40,14 +53,11 @@ body.site-mirrored #appRoot{
 .brand{display:flex; gap:12px; align-items:center}
 .brand-logo{width:40px;height:40px}
 .brand-text{display:flex;flex-direction:column}
-
-/* CueFlow giallo */
 .brand-name{font-weight:900; letter-spacing:.2px; color:var(--accent);}
 .brand-sub{font-size:12px;color:var(--muted)}
 
 .top-actions{display:flex; gap:10px; align-items:center}
 
-/* Bottoni top: testo giallo */
 .action-btn{
   display:inline-flex;
   align-items:center;
@@ -61,31 +71,41 @@ body.site-mirrored #appRoot{
   font-weight:800;
 }
 .action-btn:hover{filter:brightness(1.10)}
-.action-btn .ico{opacity:.9}
-
-/* Present più “hero” */
 .action-btn.primary{
   border-color: rgba(255,212,0,.55);
   background: linear-gradient(90deg, rgba(255,212,0,.18), rgba(255,184,0,.14));
 }
 
-/* Layout */
+/* main layout (responsive + resizable window friendly) */
 .layout{
-  display:grid;
-  grid-template-columns: 1fr 1.2fr;
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
   gap:14px;
   padding:14px;
 }
 
+/* panels */
 .panel{
   background:#000;
   border:1px solid var(--border);
   border-radius:16px;
   padding:12px;
-  min-height: calc(100vh - 90px);
+  min-height:0;
+  display:flex;
+  flex-direction:column;
 }
 
-/* Script + Teleprompter gialli */
+/* default widths */
+.panel.editor{
+  flex:0 0 420px; /* larghezza base script */
+  max-width:520px;
+}
+.panel.prompter{
+  flex:1 1 auto;  /* teleprompter prende tutto lo spazio disponibile */
+  min-width:260px;
+}
+
 .panel-title{
   font-weight:800;
   margin-bottom:10px;
@@ -93,6 +113,48 @@ body.site-mirrored #appRoot{
   color:var(--accent);
 }
 
+/* header del pannello script con freccia */
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.collapse-btn{
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  color: var(--accent);
+  border-radius:12px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-weight:900;
+}
+.collapse-btn:hover{filter:brightness(1.10)}
+
+/* stato COLLAPSED */
+body.editor-collapsed .panel.editor{
+  flex:0 0 56px;
+  max-width:56px;
+  padding:12px 8px;
+}
+body.editor-collapsed .panel.editor .tabs,
+body.editor-collapsed .panel.editor .formatbar,
+body.editor-collapsed .panel.editor .rte,
+body.editor-collapsed .panel.editor .row,
+body.editor-collapsed .panel.editor .hint{
+  display:none;
+}
+body.editor-collapsed .panel.editor .panel-title{
+  writing-mode:vertical-rl;
+  transform: rotate(180deg);
+  margin:0;
+}
+body.editor-collapsed .panel.editor .panel-head{
+  justify-content:center;
+}
+
+/* tabs */
 .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
 .tab{
   padding:8px 10px;
@@ -108,6 +170,44 @@ body.site-mirrored #appRoot{
   background:rgba(255,212,0,.12);
 }
 
+/* controls */
+.controls{
+  flex:0 0 auto;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.control-group{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:8px 10px;
+  background:rgba(255,255,255,.03);
+}
+.control-group label{font-size:12px; color:var(--muted)}
+.control-group input[type="range"]{width:140px}
+
+.control-group select{
+  background:#000;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:6px 8px;
+  outline:none;
+}
+.control-group select option{background:#fff; color:#000;}
+
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color:var(--muted)
+}
+
+/* buttons */
 .btn{
   padding:10px 12px;
   border-radius:12px;
@@ -121,48 +221,15 @@ body.site-mirrored #appRoot{
 .btn.primary{background:rgba(255,212,0,.16); border-color: rgba(255,212,0,.35);}
 .btn.secondary{background:rgba(255,255,255,.05);}
 .btn.danger{background:rgba(255,79,109,.18); border-color: rgba(255,79,109,.4);}
-
 .btn.tiny{padding:8px 10px; border-radius:10px; font-size:12px;}
 .btn.chip{background: var(--chip); border-color: rgba(255,255,255,.14);}
 
 .row{display:flex; gap:10px; margin-top:10px}
 .hint{margin-top:10px; font-size:12px; color:var(--muted)}
 
-.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color:var(--muted)}
-
-/* Controls */
-.controls{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-  margin-bottom:10px;
-}
-.control-group{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:8px 10px;
-  background:rgba(255,255,255,.03);
-}
-.control-group label{font-size:12px; color:var(--muted)}
-.control-group input[type="range"]{width:140px}
-
-/* Align select readable */
-.control-group select{
-  background:#000;
-  color:var(--text);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:6px 8px;
-  outline:none;
-}
-.control-group select option{background:#fff; color:#000;}
-
-/* Toolbar */
+/* toolbar */
 .formatbar{
+  flex:0 0 auto;
   display:flex; flex-wrap:wrap;
   gap:10px; align-items:center;
   padding:8px;
@@ -176,10 +243,10 @@ body.site-mirrored #appRoot{
 .group{display:flex; gap:8px; align-items:center}
 .label{font-size:12px; color:var(--muted)}
 
-/* Editor */
+/* editor area grows/shrinks */
 .rte{
-  width:100%;
-  min-height: 58vh;
+  flex:1 1 auto;
+  min-height:0;
   padding:12px;
   border-radius:14px;
   border:1px solid var(--border);
@@ -193,16 +260,17 @@ body.site-mirrored #appRoot{
 }
 .rte:empty:before{content:"Paste your script here..."; color:rgba(255,255,255,.35);}
 
-/* Teleprompter */
+/* teleprompter viewer grows/shrinks */
 .viewer-wrap{
+  flex:1 1 auto;
+  min-height:0;
   border:1px solid var(--border);
   border-radius:16px;
   overflow:hidden;
-  height: calc(100vh - 190px);
   background:#000;
 }
 
-/* Mirror solo prompt */
+/* mirror solo prompt */
 .viewer-wrap.mirrored{ transform: scaleX(-1); transform-origin:center; }
 
 .viewer{
@@ -225,7 +293,7 @@ body.site-mirrored #appRoot{
   white-space:pre-wrap;
 }
 
-/* Present */
+/* present overlay unchanged */
 .present{ position:fixed; inset:0; background:#000; z-index:1000; display:flex; flex-direction:column; }
 .present.hidden{display:none}
 .present.mirroredPresent .present-view{ transform: scaleX(-1); transform-origin:center; }
@@ -236,8 +304,7 @@ body.site-mirrored #appRoot{
   align-items:center; flex-wrap:wrap;
   background:#000;
 }
-
-.present-view{ flex:1; overflow:hidden; position:relative; background:#000; }
+.present-view{ flex:1; overflow:hidden; position:relative; background:#000; min-height:0; }
 .present-scroll-layer{ position:absolute; inset:0; will-change: transform; }
 
 .present-content{
@@ -259,3 +326,13 @@ body.site-mirrored #appRoot{
   background:rgba(255,255,255,.05);
 }
 .tag{font-size:12px; color:rgba(255,255,255,.75)}
+
+/* responsive: su schermi stretti metti pannelli in colonna */
+@media (max-width: 980px){
+  .layout{ flex-direction:column; }
+  .panel.editor{ flex:0 0 auto; max-width:none; }
+  body.editor-collapsed .panel.editor{
+    flex:0 0 auto;
+    max-width:none;
+  }
+}
