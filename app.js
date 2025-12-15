@@ -1,10 +1,13 @@
 const SLOTS = 5;
-const LS_KEY = "cueflow_slots_v3_html";
+const LS_KEY = "cueflow_slots_v4_html";
 
+/* ------------------ helpers ------------------ */
 const $ = (id) => document.getElementById(id);
 
+/* ------------------ elements ------------------ */
 const slotsEl = $("slots");
 const scriptInput = $("scriptInput");
+
 const btnSave = $("btnSave");
 const btnClear = $("btnClear");
 
@@ -22,46 +25,53 @@ const hlClear = $("hlClear");
 
 const btnPlay = $("btnPlay");
 const btnReset = $("btnReset");
+
 const speed = $("speed");
 const speedVal = $("speedVal");
+
 const fontSize = $("fontSize");
 const fontVal = $("fontVal");
+
 const align = $("align");
 
 const viewerWrap = $("viewerWrap");
-const viewer = $("viewer");
 const scrollLayer = $("scrollLayer");
 const content = $("content");
 
-const btnFullscreen = $("btnFullscreen");
 const btnMirror = $("btnMirror");
+const btnSiteMirror = $("btnSiteMirror");
+const btnFullscreen = $("btnFullscreen");
 const btnPresent = $("btnPresent");
 
 const presentOverlay = $("presentOverlay");
 const presentView = $("presentView");
 const presentScrollLayer = $("presentScrollLayer");
 const presentContent = $("presentContent");
+
 const pPlay = $("pPlay");
 const pReset = $("pReset");
 const pExit = $("pExit");
+
 const pSpeed = $("pSpeed");
 const pSpeedVal = $("pSpeedVal");
+
 const pFont = $("pFont");
 const pFontVal = $("pFontVal");
+
 const pMirror = $("pMirror");
 
+/* ------------------ state ------------------ */
 let slots = loadSlots();
 let activeSlot = 1;
 
 let isPlaying = false;
 let rafId = null;
 
-// scroll offsets
 let y = 0;
 let presentY = 0;
 let lastTs = null;
 
-/* ---------- storage ---------- */
+/* ------------------ storage ------------------ */
 function initSlots(){
   const base = {};
   for(let i=1;i<=SLOTS;i++) base[i] = "";
@@ -84,12 +94,12 @@ function saveSlots(){
   localStorage.setItem(LS_KEY, JSON.stringify(slots));
 }
 
-/* ---------- tabs ---------- */
+/* ------------------ tabs ------------------ */
 function renderTabs(){
   slotsEl.innerHTML = "";
   for(let i=1;i<=SLOTS;i++){
     const b = document.createElement("button");
-    b.className = "tab" + (i===activeSlot ? " active" : "");
+    b.className = "tab" + (i === activeSlot ? " active" : "");
     b.textContent = `Script ${i}`;
     b.onclick = () => {
       persistActiveHTML();
@@ -112,18 +122,19 @@ function loadActiveHTML(){
   scriptInput.innerHTML = slots[activeSlot] || "";
 }
 
-/* ---------- sync ---------- */
+/* ------------------ sync ------------------ */
 function syncTeleprompterHTML(){
   const html = scriptInput.innerHTML || "";
   content.innerHTML = html;
   presentContent.innerHTML = html;
+
   requestAnimationFrame(() => {
     clampScroll();
     applyScroll();
   });
 }
 
-/* ---------- scrolling ---------- */
+/* ------------------ scrolling ------------------ */
 function resetScroll(){
   y = 0;
   presentY = 0;
@@ -133,7 +144,7 @@ function resetScroll(){
 
 function clampScroll(){
   const h = content.scrollHeight;
-  const wrapH = viewer.clientHeight;
+  const wrapH = viewerWrap.clientHeight;
   const maxY = Math.max(0, h - wrapH + 40);
   y = Math.min(Math.max(y, 0), maxY);
 
@@ -147,7 +158,6 @@ function clampScroll(){
 }
 
 function applyScroll(){
-  // NEW: apply translate to scroll layers, not the text nodes
   scrollLayer.style.transform = `translateY(${-y}px)`;
   presentScrollLayer.style.transform = `translateY(${-presentY}px)`;
 }
@@ -158,7 +168,8 @@ function speedPxPerSec(){
 
 function tick(ts){
   if(!isPlaying) return;
-  if(lastTs == null) lastTs = ts;
+
+  if(lastTs === null) lastTs = ts;
   const dt = (ts - lastTs) / 1000;
   lastTs = ts;
 
@@ -169,6 +180,7 @@ function tick(ts){
   rafId = requestAnimationFrame(tick);
 }
 
+/* ------------------ play controls ------------------ */
 function play(){
   if(isPlaying) return;
   isPlaying = true;
@@ -190,10 +202,10 @@ function togglePlay(){
   isPlaying ? pause() : play();
 }
 
-/* ---------- formatting helpers ---------- */
+/* ------------------ formatting ------------------ */
 function focusEditor(){ scriptInput.focus(); }
 
-function exec(cmd, value=null){
+function exec(cmd, value = null){
   focusEditor();
   document.execCommand(cmd, false, value);
   persistActiveHTML();
@@ -219,7 +231,7 @@ function clearHighlight(){
   applyHighlight("transparent");
 }
 
-/* ---------- view settings ---------- */
+/* ------------------ view settings ------------------ */
 function setFont(px){
   content.style.fontSize = `${px}px`;
   presentContent.style.fontSize = `${Math.max(px, 40) + 16}px`;
@@ -231,15 +243,17 @@ function setAlign(a){
 }
 
 function toggleMirror(){
-  // NEW: mirror via wrapper classes only
   viewerWrap.classList.toggle("mirrored");
   presentOverlay.classList.toggle("mirroredPresent");
 }
 
+function toggleSiteMirror(){
+  document.body.classList.toggle("site-mirrored");
+}
+
 function toggleFullscreen(){
-  const el = document.documentElement;
   if(!document.fullscreenElement){
-    el.requestFullscreen?.();
+    document.documentElement.requestFullscreen?.();
   }else{
     document.exitFullscreen?.();
   }
@@ -271,8 +285,9 @@ function closePresent(){
   }
 }
 
-/* ---------- bindings ---------- */
-btnSave.onclick = () => persistActiveHTML();
+/* ------------------ bindings ------------------ */
+btnSave.onclick = persistActiveHTML;
+
 btnClear.onclick = () => {
   scriptInput.innerHTML = "";
   persistActiveHTML();
@@ -322,9 +337,12 @@ pFont.addEventListener("input", () => {
 
 align.addEventListener("change", () => setAlign(align.value));
 
-btnFullscreen.onclick = toggleFullscreen;
 btnMirror.onclick = toggleMirror;
 pMirror.onclick = toggleMirror;
+
+btnSiteMirror.onclick = toggleSiteMirror;
+
+btnFullscreen.onclick = toggleFullscreen;
 
 btnPresent.onclick = openPresent;
 pExit.onclick = closePresent;
@@ -334,15 +352,15 @@ fmtBold.onclick = () => exec("bold");
 fmtItalic.onclick = () => exec("italic");
 fmtUnderline.onclick = () => exec("underline");
 
-tcYellow.onclick = () => setTextColor("#ffd400");
-tcGreen.onclick = () => setTextColor("#00ff7b");
-tcReset.onclick = () => setTextColor("#ffffff");
+tcYellow.onclick = () => setTextColor("#FFD400");
+tcGreen.onclick = () => setTextColor("#00FF7B");
+tcReset.onclick = () => setTextColor("#FFFFFF");
 
-hlBlue.onclick = () => applyHighlight("#4f7cff");
-hlPink.onclick = () => applyHighlight("#ff4fd8");
-hlClear.onclick = () => clearHighlight();
+hlBlue.onclick = () => applyHighlight("#4F7CFF");
+hlPink.onclick = () => applyHighlight("#FF4FD8");
+hlClear.onclick = clearHighlight;
 
-/* shortcuts */
+/* ------------------ keyboard shortcuts ------------------ */
 document.addEventListener("keydown", (e) => {
   const inEditor = (e.target && e.target.id) === "scriptInput";
 
@@ -357,8 +375,14 @@ document.addEventListener("keydown", (e) => {
   if(inEditor) return;
 
   if(e.code === "Space"){ e.preventDefault(); togglePlay(); }
+
+  if((e.key === "m" || e.key === "M") && e.shiftKey){
+    toggleSiteMirror();
+  }else if(e.key === "m" || e.key === "M"){
+    toggleMirror();
+  }
+
   if(e.key === "f" || e.key === "F"){ toggleFullscreen(); }
-  if(e.key === "m" || e.key === "M"){ toggleMirror(); }
   if(e.key === "r" || e.key === "R"){ pause(); resetScroll(); }
 
   if(e.key === "ArrowUp"){ speed.value = String(Math.min(200, Number(speed.value)+5)); speed.dispatchEvent(new Event("input")); }
@@ -367,13 +391,15 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "-"){ fontSize.value = String(Math.max(18, Number(fontSize.value)-2)); fontSize.dispatchEvent(new Event("input")); }
 });
 
-/* init */
+/* ------------------ init ------------------ */
 renderTabs();
 loadActiveHTML();
 syncTeleprompterHTML();
 
 speedVal.textContent = speed.value;
 fontVal.textContent = fontSize.value;
+
 setFont(Number(fontSize.value));
 setAlign(align.value);
 resetScroll();
+
