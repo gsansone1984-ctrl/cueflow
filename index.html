@@ -9,17 +9,23 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="logo">CF</div>
-      <div>
+      <img class="brand-logo" src="logo.svg" alt="CueFlow logo" />
+      <div class="brand-text">
         <div class="brand-name">CueFlow</div>
         <div class="brand-sub">Teleprompter for creators</div>
       </div>
     </div>
 
     <div class="top-actions">
-      <button id="btnFullscreen" class="btn secondary" title="Fullscreen (F)">Fullscreen</button>
-      <button id="btnMirror" class="btn secondary" title="Mirror (M)">Mirror</button>
-      <button id="btnPresent" class="btn primary" title="Present mode">Present</button>
+      <button id="btnMirror" class="action-btn" title="Mirror (M)">
+        <span class="ico">⇄</span> Mirror
+      </button>
+      <button id="btnFullscreen" class="action-btn" title="Fullscreen (F)">
+        <span class="ico">⤢</span> Fullscreen
+      </button>
+      <button id="btnPresent" class="action-btn primary" title="Present mode">
+        <span class="ico">▶</span> Present
+      </button>
     </div>
   </header>
 
@@ -37,12 +43,21 @@
 
         <div class="sep"></div>
 
-        <button class="btn tiny hl yellow" id="hlYellow" title="Highlight Yellow">Yellow</button>
-        <button class="btn tiny hl green" id="hlGreen" title="Highlight Green">Green</button>
-        <button class="btn tiny hl blue" id="hlBlue" title="Highlight Blue">Blue</button>
-        <button class="btn tiny hl pink" id="hlPink" title="Highlight Pink">Pink</button>
+        <div class="group">
+          <span class="label">Text</span>
+          <button class="btn tiny chip" id="tcYellow" title="Text color: Yellow">Yellow</button>
+          <button class="btn tiny chip" id="tcGreen" title="Text color: Green">Green</button>
+          <button class="btn tiny secondary" id="tcReset" title="Text color: Default">Reset</button>
+        </div>
 
-        <button class="btn tiny secondary" id="hlClear" title="Remove highlight">Clear</button>
+        <div class="sep"></div>
+
+        <div class="group">
+          <span class="label">Highlight</span>
+          <button class="btn tiny chip hl blue" id="hlBlue" title="Highlight Blue">Blue</button>
+          <button class="btn tiny chip hl pink" id="hlPink" title="Highlight Pink">Pink</button>
+          <button class="btn tiny secondary" id="hlClear" title="Remove highlight">Clear</button>
+        </div>
       </div>
 
       <!-- Rich text editor -->
@@ -55,8 +70,8 @@
       </div>
 
       <div class="hint">
-        Tip: select text then use B / I / U or highlight buttons.
-        Shortcuts (viewer): Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · R reset
+        Select text then use B / I / U, Text color, or Highlight.
+        Viewer shortcuts: Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · R reset
       </div>
     </section>
 
@@ -91,7 +106,10 @@
 
       <div class="viewer-wrap" id="viewerWrap">
         <div class="viewer" id="viewer">
-          <div id="content" class="content"></div>
+          <!-- NEW: scroll layer to avoid transform conflicts with mirror -->
+          <div id="scrollLayer" class="scroll-layer">
+            <div id="content" class="content"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -120,7 +138,10 @@
     </div>
 
     <div class="present-view" id="presentView">
-      <div id="presentContent" class="present-content"></div>
+      <!-- NEW: scroll layer to avoid transform conflicts with mirror -->
+      <div id="presentScrollLayer" class="present-scroll-layer">
+        <div id="presentContent" class="present-content"></div>
+      </div>
     </div>
   </div>
 
