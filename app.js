@@ -1,6 +1,6 @@
 const SLOTS = 5;
-const LS_KEY = "cueflow_slots_v5_html";
-const LS_UI = "cueflow_ui_v1";
+const LS_KEY = "cueflow_slots_v6_html";
+const LS_UI = "cueflow_ui_v2";
 
 const $ = (id) => document.getElementById(id);
 
@@ -33,6 +33,9 @@ const fontSize = $("fontSize");
 const fontVal = $("fontVal");
 
 const align = $("align");
+
+const editorPanel = $("editorPanel");
+const splitter = $("splitter");
 
 const viewerWrap = $("viewerWrap");
 const scrollLayer = $("scrollLayer");
@@ -74,6 +77,8 @@ let y = 0;
 let presentY = 0;
 let lastTs = null;
 
+let isDragging = false;
+
 /* ---------- storage ---------- */
 function initSlots(){
   const base = {};
@@ -100,11 +105,14 @@ function saveSlots(){
 function loadUI(){
   try{
     const raw = localStorage.getItem(LS_UI);
-    if(!raw) return { editorCollapsed:false };
-    const data = JSON.parse(raw);
-    return { editorCollapsed: !!data.editorCollapsed };
+    if(!raw) return { editorCollapsed:false, editorWidth:420 };
+    const d = JSON.parse(raw);
+    return {
+      editorCollapsed: !!d.editorCollapsed,
+      editorWidth: Number(d.editorWidth) || 420
+    };
   }catch{
-    return { editorCollapsed:false };
+    return { editorCollapsed:false, editorWidth:420 };
   }
 }
 
@@ -152,6 +160,18 @@ function syncTeleprompterHTML(){
   });
 }
 
+/* ---------- start-from-bottom offsets ---------- */
+function startOffsetMain(){
+  // testo entra dal basso: spinge il contenuto giù quasi fino al bordo inferiore
+  const h = viewerWrap.clientHeight || 0;
+  return Math.max(0, h - 70);
+}
+
+function startOffsetPresent(){
+  const h = presentView.clientHeight || 0;
+  return Math.max(0, h - 140);
+}
+
 /* ---------- scrolling ---------- */
 function resetScroll(){
   y = 0;
@@ -161,23 +181,32 @@ function resetScroll(){
 }
 
 function clampScroll(){
-  const h = content.scrollHeight;
   const wrapH = viewerWrap.clientHeight;
-  const maxY = Math.max(0, h - wrapH + 40);
+  const s0 = startOffsetMain();
+
+  // con offset iniziale, la “lunghezza scrollabile” aumenta
+  const total = content.scrollHeight + s0;
+  const maxY = Math.max(0, total - wrapH + 40);
   y = Math.min(Math.max(y, 0), maxY);
 
-  const ph = presentContent.scrollHeight;
   const pWrapH = presentView.clientHeight;
-  const pMaxY = Math.max(0, ph - pWrapH + 80);
+  const ps0 = startOffsetPresent();
+  const pTotal = presentContent.scrollHeight + ps0;
+  const pMaxY = Math.max(0, pTotal - pWrapH + 80);
 
+  // proporzione coerente tra main e present
   const ratio = maxY === 0 ? 0 : (y / maxY);
   presentY = ratio * pMaxY;
   presentY = Math.min(Math.max(presentY, 0), pMaxY);
 }
 
 function applyScroll(){
-  scrollLayer.style.transform = `translateY(${-y}px)`;
-  presentScrollLayer.style.transform = `translateY(${-presentY}px)`;
+  const s0 = startOffsetMain();
+  const ps0 = startOffsetPresent();
+
+  // y cresce => contenuto sale. Inizio: offset positivo => testo appare dal basso.
+  scrollLayer.style.transform = `translateY(${s0 - y}px)`;
+  presentScrollLayer.style.transform = `translateY(${ps0 - presentY}px)`;
 }
 
 function speedPxPerSec(){
@@ -253,6 +282,7 @@ function clearHighlight(){
 function setFont(px){
   content.style.fontSize = `${px}px`;
   presentContent.style.fontSize = `${Math.max(px, 40) + 16}px`;
+  requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
 
 function setAlign(a){
@@ -307,8 +337,10 @@ function closePresent(){
 function setEditorCollapsed(collapsed){
   document.body.classList.toggle("editor-collapsed", collapsed);
   collapseIcon.textContent = collapsed ? "▶" : "◀";
-  saveUI({ editorCollapsed: collapsed });
-  // important: recalc scroll bounds after layout changes
+
+  const ui = loadUI();
+  saveUI({ ...ui, editorCollapsed: collapsed });
+
   requestAnimationFrame(() => {
     clampScroll();
     applyScroll();
@@ -318,6 +350,44 @@ function setEditorCollapsed(collapsed){
 function toggleEditorCollapsed(){
   const collapsed = document.body.classList.contains("editor-collapsed");
   setEditorCollapsed(!collapsed);
+}
+
+/* ---------- drag resize ---------- */
+function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+
+function setEditorWidth(px){
+  editorPanel.style.flexBasis = `${px}px`;
+  const ui = loadUI();
+  saveUI({ ...ui, editorWidth: px });
+  requestAnimationFrame(() => { clampScroll(); applyScroll(); });
+}
+
+function startDrag(e){
+  if(document.body.classList.contains("editor-collapsed")) return;
+  isDragging = true;
+  document.body.classList.add("dragging");
+  e.preventDefault();
+}
+
+function onDragMove(e){
+  if(!isDragging) return;
+
+  // calcola larghezza editor in base al mouse X
+  const layoutRect = document.getElementById("layout").getBoundingClientRect();
+  const x = e.clientX - layoutRect.left;
+
+  // limiti ragionevoli
+  const minW = 280;
+  const maxW = Math.min(720, layoutRect.width - 260);
+
+  const newW = clamp(x, minW, maxW);
+  setEditorWidth(newW);
+}
+
+function stopDrag(){
+  if(!isDragging) return;
+  isDragging = false;
+  document.body.classList.remove("dragging");
 }
 
 /* ---------- bindings ---------- */
@@ -358,7 +428,6 @@ fontSize.addEventListener("input", () => {
   setFont(Number(fontSize.value));
   pFont.value = Math.max(Number(fontSize.value), 40) + 16;
   pFontVal.textContent = pFont.value;
-  requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 });
 
 pFont.addEventListener("input", () => {
@@ -367,7 +436,6 @@ pFont.addEventListener("input", () => {
   fontSize.value = String(mainPx);
   fontVal.textContent = fontSize.value;
   setFont(mainPx);
-  requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 });
 
 align.addEventListener("change", () => setAlign(align.value));
@@ -376,7 +444,6 @@ btnMirror.onclick = toggleMirror;
 pMirror.onclick = toggleMirror;
 
 btnSiteMirror.onclick = toggleSiteMirror;
-
 btnFullscreen.onclick = toggleFullscreen;
 
 btnPresent.onclick = openPresent;
@@ -396,6 +463,11 @@ tcReset.onclick = () => setTextColor("#FFFFFF");
 hlBlue.onclick = () => applyHighlight("#4F7CFF");
 hlPink.onclick = () => applyHighlight("#FF4FD8");
 hlClear.onclick = clearHighlight;
+
+/* splitter drag events */
+splitter.addEventListener("mousedown", startDrag);
+window.addEventListener("mousemove", onDragMove);
+window.addEventListener("mouseup", stopDrag);
 
 /* keyboard shortcuts */
 document.addEventListener("keydown", (e) => {
@@ -427,7 +499,7 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "-"){ fontSize.value = String(Math.max(18, Number(fontSize.value)-2)); fontSize.dispatchEvent(new Event("input")); }
 });
 
-/* window resize: keep scroll bounds correct */
+/* resize */
 window.addEventListener("resize", () => {
   requestAnimationFrame(() => {
     clampScroll();
@@ -450,5 +522,5 @@ resetScroll();
 /* restore UI state */
 const ui = loadUI();
 setEditorCollapsed(ui.editorCollapsed);
-
+setEditorWidth(ui.editorWidth);
 
