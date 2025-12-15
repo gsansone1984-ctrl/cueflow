@@ -5,27 +5,23 @@
   --border:rgba(255,255,255,.12);
   --danger:#ff4f6d;
 
-  --accent:#FFD400;   /* giallo logo */
+  --accent:#FFD400;
   --accent2:#FFB800;
 
   --chip: rgba(255,255,255,.06);
 }
 
 *{box-sizing:border-box}
-
-html, body{
-  height:100%;
-}
+html, body{height:100%}
 
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   background: var(--bg);
   color:var(--text);
-  overflow:hidden; /* importante: layout “app-like” */
+  overflow:hidden;
 }
 
-/* wrapper app */
 #appRoot{
   height:100dvh;
   display:flex;
@@ -33,7 +29,6 @@ body{
   min-height:0;
 }
 
-/* mirror tutto sito */
 body.site-mirrored #appRoot{
   transform: scaleX(-1);
   transform-origin:center;
@@ -42,7 +37,6 @@ body.site-mirrored #appRoot{
 /* topbar */
 .topbar{
   flex:0 0 auto;
-  position:sticky; top:0;
   display:flex; align-items:center; justify-content:space-between;
   padding:14px 16px;
   border-bottom:1px solid var(--border);
@@ -59,9 +53,7 @@ body.site-mirrored #appRoot{
 .top-actions{display:flex; gap:10px; align-items:center}
 
 .action-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
+  display:inline-flex; align-items:center; gap:8px;
   padding:10px 14px;
   border-radius:999px;
   border:1px solid rgba(255,255,255,.16);
@@ -76,12 +68,12 @@ body.site-mirrored #appRoot{
   background: linear-gradient(90deg, rgba(255,212,0,.18), rgba(255,184,0,.14));
 }
 
-/* main layout (responsive + resizable window friendly) */
+/* layout */
 .layout{
   flex:1 1 auto;
   min-height:0;
   display:flex;
-  gap:14px;
+  gap:0;               /* splitter gestisce la separazione */
   padding:14px;
 }
 
@@ -96,14 +88,15 @@ body.site-mirrored #appRoot{
   flex-direction:column;
 }
 
-/* default widths */
+/* editor width set via JS (flex-basis) */
 .panel.editor{
-  flex:0 0 420px; /* larghezza base script */
-  max-width:520px;
+  flex:0 0 420px;
+  max-width:720px;
 }
 .panel.prompter{
-  flex:1 1 auto;  /* teleprompter prende tutto lo spazio disponibile */
+  flex:1 1 auto;
   min-width:260px;
+  margin-left:14px; /* spazio dopo splitter */
 }
 
 .panel-title{
@@ -113,7 +106,6 @@ body.site-mirrored #appRoot{
   color:var(--accent);
 }
 
-/* header del pannello script con freccia */
 .panel-head{
   display:flex;
   align-items:center;
@@ -132,11 +124,43 @@ body.site-mirrored #appRoot{
 }
 .collapse-btn:hover{filter:brightness(1.10)}
 
-/* stato COLLAPSED */
+/* splitter */
+.splitter{
+  width:14px;
+  margin:0 14px;
+  cursor:col-resize;
+  position:relative;
+  flex:0 0 auto;
+  border-radius:12px;
+}
+.splitter:before{
+  content:"";
+  position:absolute;
+  top:10px; bottom:10px;
+  left:50%;
+  width:2px;
+  transform:translateX(-50%);
+  background: rgba(255,255,255,.14);
+  border-radius:999px;
+}
+.splitter:hover:before{
+  background: rgba(255,212,0,.55);
+}
+body.dragging .splitter:before{
+  background: rgba(255,212,0,.85);
+}
+
+/* collapsed editor state */
 body.editor-collapsed .panel.editor{
-  flex:0 0 56px;
-  max-width:56px;
+  flex:0 0 56px !important;
+  max-width:56px !important;
   padding:12px 8px;
+}
+body.editor-collapsed .splitter{
+  display:none;
+}
+body.editor-collapsed .panel.prompter{
+  margin-left:0;
 }
 body.editor-collapsed .panel.editor .tabs,
 body.editor-collapsed .panel.editor .formatbar,
@@ -243,7 +267,7 @@ body.editor-collapsed .panel.editor .panel-head{
 .group{display:flex; gap:8px; align-items:center}
 .label{font-size:12px; color:var(--muted)}
 
-/* editor area grows/shrinks */
+/* editor */
 .rte{
   flex:1 1 auto;
   min-height:0;
@@ -260,7 +284,7 @@ body.editor-collapsed .panel.editor .panel-head{
 }
 .rte:empty:before{content:"Paste your script here..."; color:rgba(255,255,255,.35);}
 
-/* teleprompter viewer grows/shrinks */
+/* teleprompter */
 .viewer-wrap{
   flex:1 1 auto;
   min-height:0;
@@ -269,17 +293,13 @@ body.editor-collapsed .panel.editor .panel-head{
   overflow:hidden;
   background:#000;
 }
-
-/* mirror solo prompt */
 .viewer-wrap.mirrored{ transform: scaleX(-1); transform-origin:center; }
-
 .viewer{
   height:100%;
   overflow:hidden;
   position:relative;
   background:#000;
 }
-
 .scroll-layer{ position:absolute; inset:0; will-change: transform; }
 
 .content{
@@ -293,7 +313,7 @@ body.editor-collapsed .panel.editor .panel-head{
   white-space:pre-wrap;
 }
 
-/* present overlay unchanged */
+/* present */
 .present{ position:fixed; inset:0; background:#000; z-index:1000; display:flex; flex-direction:column; }
 .present.hidden{display:none}
 .present.mirroredPresent .present-view{ transform: scaleX(-1); transform-origin:center; }
@@ -327,12 +347,12 @@ body.editor-collapsed .panel.editor .panel-head{
 }
 .tag{font-size:12px; color:rgba(255,255,255,.75)}
 
-/* responsive: su schermi stretti metti pannelli in colonna */
+/* responsive (stack) */
 @media (max-width: 980px){
-  .layout{ flex-direction:column; }
-  .panel.editor{ flex:0 0 auto; max-width:none; }
-  body.editor-collapsed .panel.editor{
-    flex:0 0 auto;
-    max-width:none;
-  }
+  body{overflow:auto;}
+  #appRoot{height:auto;}
+  .layout{flex-direction:column; gap:14px;}
+  .splitter{display:none;}
+  .panel.prompter{margin-left:0;}
+  .panel.editor{max-width:none; flex:0 0 auto;}
 }
