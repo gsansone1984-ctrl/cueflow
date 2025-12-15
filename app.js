@@ -4,7 +4,6 @@ const $ = (id) => document.getElementById(id);
 /* elements */
 const slotsEl = $("slots");
 const scriptInput = $("scriptInput");
-
 const btnClear = $("btnClear");
 
 const fmtBold = $("fmtBold");
@@ -32,8 +31,8 @@ const align = $("align");
 
 const editorPanel = $("editorPanel");
 const splitter = $("splitter");
-
 const viewerWrap = $("viewerWrap");
+
 const scrollLayer = $("scrollLayer");
 const content = $("content");
 
@@ -42,9 +41,23 @@ const btnSiteMirror = $("btnSiteMirror");
 const btnFullscreen = $("btnFullscreen");
 const btnPresent = $("btnPresent");
 
+/* mobile menu */
+const btnMenu = $("btnMenu");
+const mobileMenu = $("mobileMenu");
+const mBtnMirror = $("mBtnMirror");
+const mBtnSiteMirror = $("mBtnSiteMirror");
+const mBtnFullscreen = $("mBtnFullscreen");
+const mBtnPresent = $("mBtnPresent");
+
 const btnCollapseEditor = $("btnCollapseEditor");
 const collapseIcon = $("collapseIcon");
 
+/* About */
+const aboutLink = $("aboutLink");
+const aboutModal = $("aboutModal");
+const aboutClose = $("aboutClose");
+
+/* present */
 const presentOverlay = $("presentOverlay");
 const presentView = $("presentView");
 const presentScrollLayer = $("presentScrollLayer");
@@ -201,9 +214,9 @@ function togglePlay(){
 /* ------------------ formatting ------------------ */
 function focusEditor(){ scriptInput.focus(); }
 
-function exec(cmd, value = null){
+function exec(cmd){
   focusEditor();
-  document.execCommand(cmd, false, value);
+  document.execCommand(cmd, false, null);
   persistActiveHTML();
   syncTeleprompterHTML();
 }
@@ -269,6 +282,8 @@ function openPresent(){
   pFont.value = Math.max(Number(fontSize.value), 40) + 16;
   pFontVal.textContent = pFont.value;
 
+  closeMobileMenu();
+
   requestAnimationFrame(() => {
     clampScroll();
     applyScroll();
@@ -282,7 +297,7 @@ function closePresent(){
   }
 }
 
-/* ------------------ collapse editor (NO persistence) ------------------ */
+/* ------------------ collapse editor (no persistence) ------------------ */
 function setEditorCollapsed(collapsed){
   document.body.classList.toggle("editor-collapsed", collapsed);
   collapseIcon.textContent = collapsed ? "▶" : "◀";
@@ -293,7 +308,7 @@ function toggleEditorCollapsed(){
   setEditorCollapsed(!document.body.classList.contains("editor-collapsed"));
 }
 
-/* ------------------ drag resize (NO persistence) ------------------ */
+/* ------------------ drag resize (no persistence) ------------------ */
 function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
 
 function setEditorWidth(px){
@@ -310,13 +325,11 @@ function startDrag(e){
 
 function onDragMove(e){
   if(!isDragging) return;
-
   const layoutRect = document.getElementById("layout").getBoundingClientRect();
   const x = e.clientX - layoutRect.left;
 
   const minW = 280;
   const maxW = Math.min(720, layoutRect.width - 260);
-
   setEditorWidth(clamp(x, minW, maxW));
 }
 
@@ -326,7 +339,31 @@ function stopDrag(){
   document.body.classList.remove("dragging");
 }
 
-/* ------------------ clear (NO persistence) ------------------ */
+/* ------------------ mobile menu ------------------ */
+function openMobileMenu(){
+  mobileMenu.classList.remove("hidden");
+  btnMenu.setAttribute("aria-expanded", "true");
+}
+function closeMobileMenu(){
+  mobileMenu.classList.add("hidden");
+  btnMenu.setAttribute("aria-expanded", "false");
+}
+function toggleMobileMenu(){
+  const hidden = mobileMenu.classList.contains("hidden");
+  hidden ? openMobileMenu() : closeMobileMenu();
+}
+
+/* ------------------ About modal ------------------ */
+function openAbout(e){
+  e?.preventDefault?.();
+  aboutModal.classList.remove("hidden");
+  closeMobileMenu();
+}
+function closeAbout(){
+  aboutModal.classList.add("hidden");
+}
+
+/* ------------------ clear (no persistence) ------------------ */
 function clearAll(){
   pause();
   scriptInput.innerHTML = "";
@@ -336,6 +373,7 @@ function clearAll(){
   loadActiveHTML();
   syncTeleprompterHTML();
   resetScroll();
+  closeMobileMenu();
 }
 
 /* ------------------ bindings ------------------ */
@@ -381,14 +419,33 @@ pFont.addEventListener("input", () => {
 
 align.addEventListener("change", () => setAlign(align.value));
 
-btnMirror.onclick = toggleMirror;
+btnMirror.onclick = () => { toggleMirror(); closeMobileMenu(); };
 pMirror.onclick = toggleMirror;
 
-btnSiteMirror.onclick = toggleSiteMirror;
-btnFullscreen.onclick = toggleFullscreen;
-
+btnSiteMirror.onclick = () => { toggleSiteMirror(); closeMobileMenu(); };
+btnFullscreen.onclick = () => { toggleFullscreen(); closeMobileMenu(); };
 btnPresent.onclick = openPresent;
-pExit.onclick = closePresent;
+
+/* mobile menu buttons */
+btnMenu.onclick = toggleMobileMenu;
+mBtnMirror.onclick = () => { toggleMirror(); closeMobileMenu(); };
+mBtnSiteMirror.onclick = () => { toggleSiteMirror(); closeMobileMenu(); };
+mBtnFullscreen.onclick = () => { toggleFullscreen(); closeMobileMenu(); };
+mBtnPresent.onclick = openPresent;
+
+/* close menu when clicking outside */
+document.addEventListener("click", (e) => {
+  if(mobileMenu.classList.contains("hidden")) return;
+  const clickInside = mobileMenu.contains(e.target) || btnMenu.contains(e.target);
+  if(!clickInside) closeMobileMenu();
+});
+
+/* About */
+aboutLink.onclick = openAbout;
+aboutClose.onclick = closeAbout;
+aboutModal.addEventListener("click", (e) => {
+  if(e.target === aboutModal) closeAbout();
+});
 
 btnCollapseEditor.onclick = toggleEditorCollapsed;
 
@@ -405,7 +462,7 @@ hlBlue.onclick = () => applyHighlight("#4F7CFF");
 hlPink.onclick = () => applyHighlight("#FF4FD8");
 hlClear.onclick = clearHighlight;
 
-/* splitter drag events */
+/* splitter drag */
 splitter?.addEventListener("mousedown", startDrag);
 window.addEventListener("mousemove", onDragMove);
 window.addEventListener("mouseup", stopDrag);
@@ -433,6 +490,7 @@ document.addEventListener("keydown", (e) => {
 
   if(e.key === "f" || e.key === "F"){ toggleFullscreen(); }
   if(e.key === "r" || e.key === "R"){ pause(); resetScroll(); }
+  if(e.key === "Escape"){ closeMobileMenu(); closeAbout(); }
 
   if(e.key === "ArrowUp"){ speed.value = String(Math.min(200, Number(speed.value)+5)); speed.dispatchEvent(new Event("input")); }
   if(e.key === "ArrowDown"){ speed.value = String(Math.max(5, Number(speed.value)-5)); speed.dispatchEvent(new Event("input")); }
@@ -447,12 +505,10 @@ window.addEventListener("resize", () => {
   });
 });
 
-/* ------------------ init (IMPORTANT: always empty on load) ------------------ */
+/* init: always empty on load (no saving) */
 function init(){
-  // Ensure nothing is retained on refresh:
   clearAll();
 
-  // Default UI:
   speedVal.textContent = speed.value;
   fontVal.textContent = fontSize.value;
 
@@ -460,6 +516,8 @@ function init(){
   setAlign(align.value);
   setEditorCollapsed(false);
   setEditorWidth(420);
+  closeMobileMenu();
+  closeAbout();
 }
 
 init();
