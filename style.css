@@ -3,10 +3,11 @@
   --text:#f2f2f2;
   --muted:#bdbdbd;
   --border:rgba(255,255,255,.12);
-
-  --primary:#4f7cff;
-  --primary2:#7a5cff;
   --danger:#ff4f6d;
+
+  /* GIALLO LOGO */
+  --accent:#FFD400;
+  --accent2:#FFB800;
 
   --chip: rgba(255,255,255,.06);
 }
@@ -18,6 +19,12 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   background: var(--bg);
   color:var(--text);
+}
+
+/* MIRROR TUTTO IL SITO */
+body.site-mirrored #appRoot{
+  transform: scaleX(-1);
+  transform-origin: center;
 }
 
 /* Topbar */
@@ -33,12 +40,14 @@ body{
 .brand{display:flex; gap:12px; align-items:center}
 .brand-logo{width:40px;height:40px}
 .brand-text{display:flex;flex-direction:column}
-.brand-name{font-weight:800; letter-spacing:.2px}
+
+/* CueFlow giallo */
+.brand-name{font-weight:900; letter-spacing:.2px; color:var(--accent);}
 .brand-sub{font-size:12px;color:var(--muted)}
 
 .top-actions{display:flex; gap:10px; align-items:center}
 
-/* More attractive top buttons */
+/* Bottoni top: testo giallo */
 .action-btn{
   display:inline-flex;
   align-items:center;
@@ -47,15 +56,17 @@ body{
   border-radius:999px;
   border:1px solid rgba(255,255,255,.16);
   background: rgba(255,255,255,.05);
-  color: var(--text);
+  color: var(--accent);
   cursor:pointer;
-  font-weight:700;
+  font-weight:800;
 }
 .action-btn:hover{filter:brightness(1.10)}
 .action-btn .ico{opacity:.9}
+
+/* Present più “hero” */
 .action-btn.primary{
-  border-color: rgba(79,124,255,.55);
-  background: linear-gradient(90deg, rgba(79,124,255,.25), rgba(122,92,255,.22));
+  border-color: rgba(255,212,0,.55);
+  background: linear-gradient(90deg, rgba(255,212,0,.18), rgba(255,184,0,.14));
 }
 
 /* Layout */
@@ -74,14 +85,14 @@ body{
   min-height: calc(100vh - 90px);
 }
 
+/* Script + Teleprompter gialli */
 .panel-title{
-  font-weight:700;
+  font-weight:800;
   margin-bottom:10px;
-  color:var(--muted);
   letter-spacing:.2px;
+  color:var(--accent);
 }
 
-/* Tabs */
 .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
 .tab{
   padding:8px 10px;
@@ -93,11 +104,10 @@ body{
   font-size:13px;
 }
 .tab.active{
-  border-color: rgba(79,124,255,.55);
-  background:rgba(79,124,255,.20);
+  border-color: rgba(255,212,0,.45);
+  background:rgba(255,212,0,.12);
 }
 
-/* Buttons */
 .btn{
   padding:10px 12px;
   border-radius:12px;
@@ -105,30 +115,20 @@ body{
   background:rgba(255,255,255,.06);
   color:var(--text);
   cursor:pointer;
-  font-weight:600;
+  font-weight:700;
 }
 .btn:hover{filter:brightness(1.08)}
-.btn.primary{background:rgba(79,124,255,.22); border-color: rgba(79,124,255,.45);}
+.btn.primary{background:rgba(255,212,0,.16); border-color: rgba(255,212,0,.35);}
 .btn.secondary{background:rgba(255,255,255,.05);}
 .btn.danger{background:rgba(255,79,109,.18); border-color: rgba(255,79,109,.4);}
 
-.btn.tiny{
-  padding:8px 10px;
-  border-radius:10px;
-  font-size:12px;
-}
-.btn.chip{
-  background: var(--chip);
-  border-color: rgba(255,255,255,.14);
-}
+.btn.tiny{padding:8px 10px; border-radius:10px; font-size:12px;}
+.btn.chip{background: var(--chip); border-color: rgba(255,255,255,.14);}
 
 .row{display:flex; gap:10px; margin-top:10px}
 .hint{margin-top:10px; font-size:12px; color:var(--muted)}
 
-.mono{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  color:var(--muted)
-}
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color:var(--muted)}
 
 /* Controls */
 .controls{
@@ -159,35 +159,22 @@ body{
   padding:6px 8px;
   outline:none;
 }
-.control-group select option{
-  background:#fff;
-  color:#000;
-}
+.control-group select option{background:#fff; color:#000;}
 
-/* Rich Text Editor toolbar */
+/* Toolbar */
 .formatbar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
+  display:flex; flex-wrap:wrap;
+  gap:10px; align-items:center;
   padding:8px;
   border:1px solid var(--border);
   border-radius:14px;
   background:rgba(255,255,255,.03);
   margin-bottom:10px;
 }
-.sep{
-  width:1px;
-  height:24px;
-  background:rgba(255,255,255,.12);
-}
+.sep{width:1px; height:24px; background:rgba(255,255,255,.12);}
 .kbd{font-weight:900; letter-spacing:.4px}
 .group{display:flex; gap:8px; align-items:center}
 .label{font-size:12px; color:var(--muted)}
-
-/* Highlight chips (only blue + pink kept) */
-.btn.hl.blue{ }
-.btn.hl.pink{ }
 
 /* Editor */
 .rte{
@@ -204,10 +191,7 @@ body{
   overflow:auto;
   white-space:pre-wrap;
 }
-.rte:empty:before{
-  content:"Paste your script here...";
-  color:rgba(255,255,255,.35);
-}
+.rte:empty:before{content:"Paste your script here..."; color:rgba(255,255,255,.35);}
 
 /* Teleprompter */
 .viewer-wrap{
@@ -218,10 +202,8 @@ body{
   background:#000;
 }
 
-/* MIRROR FIX: mirror the wrapper, not the text layer */
-.viewer-wrap.mirrored{
-  transform: scaleX(-1);
-}
+/* Mirror solo prompt */
+.viewer-wrap.mirrored{ transform: scaleX(-1); transform-origin:center; }
 
 .viewer{
   height:100%;
@@ -230,16 +212,11 @@ body{
   background:#000;
 }
 
-.scroll-layer{
-  position:absolute;
-  inset:0;
-  will-change: transform;
-}
+.scroll-layer{ position:absolute; inset:0; will-change: transform; }
 
 .content{
   position:absolute;
-  top:0;
-  left:0;
+  top:0; left:0;
   width:100%;
   padding:28px 26px 140px;
   font-size:40px;
@@ -248,53 +225,23 @@ body{
   white-space:pre-wrap;
 }
 
-/* Rich formatted output */
-.content b, .content strong{font-weight:800}
-.content i, .content em{font-style:italic}
-.content u{text-decoration:underline}
-
-/* Present overlay */
-.present{
-  position:fixed;
-  inset:0;
-  background:#000;
-  z-index:1000;
-  display:flex;
-  flex-direction:column;
-}
+/* Present */
+.present{ position:fixed; inset:0; background:#000; z-index:1000; display:flex; flex-direction:column; }
 .present.hidden{display:none}
-
-/* mirror present view wrapper */
-.present.mirroredPresent .present-view{
-  transform: scaleX(-1);
-}
+.present.mirroredPresent .present-view{ transform: scaleX(-1); transform-origin:center; }
 
 .present-controls{
-  display:flex;
-  gap:10px;
-  padding:12px;
+  display:flex; gap:10px; padding:12px;
   border-bottom:1px solid rgba(255,255,255,.12);
-  align-items:center;
-  flex-wrap:wrap;
+  align-items:center; flex-wrap:wrap;
   background:#000;
 }
 
-.present-view{
-  flex:1;
-  overflow:hidden;
-  position:relative;
-  background:#000;
-}
-
-.present-scroll-layer{
-  position:absolute;
-  inset:0;
-  will-change: transform;
-}
+.present-view{ flex:1; overflow:hidden; position:relative; background:#000; }
+.present-scroll-layer{ position:absolute; inset:0; will-change: transform; }
 
 .present-content{
-  position:absolute;
-  top:0; left:0;
+  position:absolute; top:0; left:0;
   width:100%;
   padding:60px 60px 220px;
   font-size:56px;
@@ -303,9 +250,6 @@ body{
   white-space:pre-wrap;
   color:#fff;
 }
-.present-content b, .present-content strong{font-weight:800}
-.present-content i, .present-content em{font-style:italic}
-.present-content u{text-decoration:underline}
 
 .mini{
   display:flex; align-items:center; gap:8px;
