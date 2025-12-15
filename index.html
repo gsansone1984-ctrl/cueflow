@@ -17,39 +17,39 @@
         </div>
       </div>
 
-      <!-- MOBILE VIEW SWITCH -->
+      <!-- Tablet/Phone: view switch (one view at a time) -->
       <div class="view-switch" id="viewSwitch" aria-label="View switch">
         <button id="btnViewEdit" class="switch-btn active" type="button">Edit Script</button>
         <button id="btnViewPrompt" class="switch-btn" type="button">Teleprompter</button>
       </div>
 
-      <!-- Desktop actions -->
+      <!-- Desktop: actions -->
       <div class="top-actions" id="topActions">
-        <button id="btnMirror" class="action-btn" title="Mirror prompt (M)">Mirror</button>
-        <button id="btnSiteMirror" class="action-btn" title="Mirror whole site (Shift+M)">Site Mirror</button>
-        <button id="btnFullscreen" class="action-btn" title="Fullscreen (F)">Fullscreen</button>
-        <button id="btnPresent" class="action-btn primary" title="Present mode">Present</button>
+        <button id="btnMirror" class="action-btn" type="button">Mirror</button>
+        <button id="btnSiteMirror" class="action-btn" type="button">Site Mirror</button>
+        <button id="btnFullscreen" class="action-btn" type="button">Fullscreen</button>
+        <button id="btnPresent" class="action-btn primary" type="button">Present</button>
       </div>
 
-      <!-- Mobile/tablet menu button -->
-      <button id="btnMenu" class="menu-btn" aria-expanded="false" aria-controls="mobileMenu">
+      <!-- Tablet/Phone: dropdown menu -->
+      <button id="btnMenu" class="menu-btn" type="button" aria-expanded="false" aria-controls="mobileMenu">
         Menu ▾
       </button>
 
-      <!-- Mobile/tablet dropdown -->
-      <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Main menu">
-        <button id="mBtnMirror" class="menu-item" role="menuitem">Mirror</button>
-        <button id="mBtnSiteMirror" class="menu-item" role="menuitem">Site Mirror</button>
-        <button id="mBtnFullscreen" class="menu-item" role="menuitem">Fullscreen</button>
-        <button id="mBtnPresent" class="menu-item primary" role="menuitem">Present</button>
+      <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Menu">
+        <button id="mBtnMirror" class="menu-item" role="menuitem" type="button">Mirror</button>
+        <button id="mBtnSiteMirror" class="menu-item" role="menuitem" type="button">Site Mirror</button>
+        <button id="mBtnFullscreen" class="menu-item" role="menuitem" type="button">Fullscreen</button>
+        <button id="mBtnPresent" class="menu-item primary" role="menuitem" type="button">Present</button>
       </div>
     </header>
 
     <main class="layout" id="layout">
+      <!-- SCRIPT -->
       <section class="panel editor" id="editorPanel">
         <div class="panel-head">
           <div class="panel-title">Script</div>
-          <button id="btnCollapseEditor" class="collapse-btn" title="Collapse Script panel">
+          <button id="btnCollapseEditor" class="collapse-btn" type="button" title="Collapse Script (desktop)">
             <span id="collapseIcon">◀</span>
           </button>
         </div>
@@ -57,48 +57,46 @@
         <div class="tabs" id="slots"></div>
 
         <div class="formatbar">
-          <button class="btn tiny" id="fmtBold" title="Bold"><span class="kbd">B</span></button>
-          <button class="btn tiny" id="fmtItalic" title="Italic"><span class="kbd">I</span></button>
-          <button class="btn tiny" id="fmtUnderline" title="Underline"><span class="kbd">U</span></button>
-
-          <div class="sep"></div>
-
-          <div class="group">
-            <span class="label">Text</span>
-            <button class="btn tiny chip" id="tcYellow" title="Text color: Yellow">Yellow</button>
-            <button class="btn tiny chip" id="tcGreen" title="Text color: Green">Green</button>
-            <button class="btn tiny secondary" id="tcReset" title="Text color: Default">Reset</button>
+          <div class="format-left">
+            <button class="btn tiny" id="fmtBold" type="button" title="Bold"><span class="kbd">B</span></button>
+            <button class="btn tiny" id="fmtItalic" type="button" title="Italic"><span class="kbd">I</span></button>
+            <button class="btn tiny" id="fmtUnderline" type="button" title="Underline"><span class="kbd">U</span></button>
           </div>
 
-          <div class="sep"></div>
+          <div class="format-group">
+            <span class="label">Text</span>
+            <button class="btn tiny chip" id="tcYellow" type="button">Yellow</button>
+            <button class="btn tiny chip" id="tcGreen" type="button">Green</button>
+            <button class="btn tiny secondary" id="tcReset" type="button">Reset</button>
+          </div>
 
-          <div class="group">
+          <div class="format-group">
             <span class="label">Highlight</span>
-            <button class="btn tiny chip hl blue" id="hlBlue" title="Highlight Blue">Blue</button>
-            <button class="btn tiny chip hl pink" id="hlPink" title="Highlight Pink">Pink</button>
-            <button class="btn tiny secondary" id="hlClear" title="Remove highlight">Clear</button>
+            <button class="btn tiny chip" id="hlBlue" type="button">Blue</button>
+            <button class="btn tiny chip" id="hlPink" type="button">Pink</button>
+            <button class="btn tiny secondary" id="hlClear" type="button">Clear</button>
           </div>
         </div>
 
-        <div id="scriptInput" class="rte" contenteditable="true" spellcheck="false" aria-label="Script editor"></div>
+        <div id="scriptInput" class="rte" contenteditable="true" spellcheck="false"></div>
 
         <div class="row">
-          <button id="btnClear" class="btn danger">Clear</button>
+          <button id="btnClear" class="btn danger" type="button">Clear</button>
         </div>
 
-        <div class="hint">
-          Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · Shift+M site mirror · R reset · Ctrl+B/I/U formatting
-        </div>
+        <div class="hint">No saving. Refresh clears everything.</div>
       </section>
 
+      <!-- Desktop splitter -->
       <div id="splitter" class="splitter" title="Drag to resize"></div>
 
+      <!-- TELEPROMPTER -->
       <section class="panel prompter" id="prompterPanel">
         <div class="panel-title">Teleprompter</div>
 
         <div class="controls">
-          <button id="btnPlay" class="btn primary">Play</button>
-          <button id="btnReset" class="btn secondary">Reset</button>
+          <button id="btnPlay" class="btn primary" type="button">Play</button>
+          <button id="btnReset" class="btn secondary" type="button">Reset</button>
 
           <div class="control-group">
             <label>Speed</label>
@@ -133,16 +131,16 @@
     </main>
 
     <footer class="footer">
-      <div class="footer-left">© Sansone 2026</div>
+      <div>© Sansone 2026</div>
       <a href="#" id="aboutLink" class="footer-link">About</a>
     </footer>
 
-    <!-- About modal -->
+    <!-- ABOUT -->
     <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
       <div class="modal-card">
         <div class="modal-head">
           <div class="modal-title">About</div>
-          <button id="aboutClose" class="btn tiny secondary">Close</button>
+          <button id="aboutClose" class="btn tiny secondary" type="button">Close</button>
         </div>
 
         <div class="about-header">
@@ -153,81 +151,55 @@
           </div>
         </div>
 
-        <div id="aboutContent" class="modal-body">
-          <div class="about-block">
-            <p>
-              I built <strong>CueFlow</strong> because I needed a simple, clean teleprompter that matched the way I work.
-              I tried several tools, but none had the exact features and workflow I wanted for my videos.
-            </p>
+        <div class="modal-body">
+          <p>
+            I built <strong>CueFlow</strong> because I needed a simple, clean teleprompter that matched the way I work.
+            I tried several tools, but none had the exact features and workflow I wanted.
+          </p>
+          <p>
+            So I built the teleprompter I wanted to use: fast, distraction-free, and designed to work smoothly on
+            <strong>phone, tablet, and desktop</strong>.
+          </p>
 
-            <p>
-              So I built the teleprompter I wanted to use: fast, distraction-free, and designed to work smoothly on
-              <strong>phone, tablet, and desktop</strong>.
-            </p>
+          <hr class="about-hr" />
 
-            <p class="about-sign">
-              Thanks for stopping by.<br />
-              <span class="sig">— Giuseppe Sansone</span>
-            </p>
+          <h3>Free to use</h3>
+          <p>CueFlow is free and will stay free. If it helps you, share it with your community.</p>
 
-            <hr class="about-hr" />
+          <hr class="about-hr" />
 
-            <h3>Free to use</h3>
-            <p>
-              CueFlow is <strong>free</strong> and will stay free.
-              If you find it useful, share it with someone who records videos, teaches online, or creates content.
-            </p>
+          <h3>Optional donation (for charity)</h3>
+          <p>
+            If you’d like, you can leave an optional donation. Every donation will be forwarded to charity with a
+            simple transparency log and proof of transfer.
+          </p>
 
-            <hr class="about-hr" />
+          <hr class="about-hr" />
 
-            <h3>Optional donation (for charity)</h3>
-            <p>
-              If you’d like, you can leave an <strong>optional donation</strong>.
-              Every donation will be forwarded to a selected charity and I will publish a simple transparency log
-              (date, amount received, amount donated, and proof of transfer).
-            </p>
-            <p class="about-small">
-              Note: donations are optional and do not unlock features. CueFlow works the same for everyone.
-            </p>
+          <h3>Privacy</h3>
+          <p>
+            Your text is not saved and not sent anywhere. Refreshing the page clears everything.
+          </p>
 
-            <hr class="about-hr" />
+          <hr class="about-hr" />
 
-            <h3>Colophon</h3>
-            <p>
-              CueFlow is built with plain <strong>HTML, CSS and JavaScript</strong>.
-              It’s deployed as a <strong>Progressive Web App (PWA)</strong> so you can add it to your home screen.
-              On iOS, use “Add to Home Screen”. On Android, your browser may prompt you to install it.
-            </p>
-
-            <hr class="about-hr" />
-
-            <h3>Privacy</h3>
-            <p>
-              The words you type or paste into CueFlow are <strong>not saved</strong> and are <strong>not sent</strong> anywhere.
-              When you refresh the page, your script is cleared.
-              CueFlow does not use ads, and it does not store personal profiles.
-            </p>
-
-            <hr class="about-hr" />
-
-            <h3>Contact</h3>
-            <p>
-              Connect with me on LinkedIn:
-              <a class="about-link" href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank" rel="noopener noreferrer">
-                Giuseppe Sansone
-              </a>
-            </p>
-          </div>
+          <h3>Contact</h3>
+          <p>
+            LinkedIn:
+            <a class="about-link" href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank" rel="noopener noreferrer">
+              Giuseppe Sansone
+            </a>
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- Present overlay -->
+    <!-- PRESENT -->
     <div id="presentOverlay" class="present hidden">
       <div class="present-controls">
-        <button id="pPlay" class="btn primary">Play</button>
-        <button id="pReset" class="btn secondary">Reset</button>
-        <button id="pExit" class="btn danger">Exit</button>
+        <button id="pPlay" class="btn primary" type="button">Play</button>
+        <button id="pReset" class="btn secondary" type="button">Reset</button>
+        <button id="pExit" class="btn danger" type="button">Exit</button>
 
         <div class="mini">
           <span class="tag">Speed</span>
@@ -241,7 +213,7 @@
           <span id="pFontVal" class="mono">56</span>
         </div>
 
-        <button id="pMirror" class="btn secondary">Mirror</button>
+        <button id="pMirror" class="btn secondary" type="button">Mirror</button>
       </div>
 
       <div class="present-view" id="presentView">
