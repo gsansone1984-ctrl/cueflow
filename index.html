@@ -17,7 +17,8 @@
         </div>
       </div>
 
-      <div class="top-actions">
+      <!-- Desktop actions -->
+      <div class="top-actions" id="topActions">
         <button id="btnMirror" class="action-btn" title="Mirror prompt (M)">
           <span class="ico">⇄</span> Mirror
         </button>
@@ -30,6 +31,19 @@
         <button id="btnPresent" class="action-btn primary" title="Present mode">
           <span class="ico">▶</span> Present
         </button>
+      </div>
+
+      <!-- Mobile/tablet menu button -->
+      <button id="btnMenu" class="menu-btn" aria-expanded="false" aria-controls="mobileMenu">
+        Menu ▾
+      </button>
+
+      <!-- Mobile/tablet dropdown -->
+      <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Main menu">
+        <button id="mBtnMirror" class="menu-item" role="menuitem">Mirror</button>
+        <button id="mBtnSiteMirror" class="menu-item" role="menuitem">Site Mirror</button>
+        <button id="mBtnFullscreen" class="menu-item" role="menuitem">Fullscreen</button>
+        <button id="mBtnPresent" class="menu-item primary" role="menuitem">Present</button>
       </div>
     </header>
 
@@ -79,7 +93,6 @@
         </div>
       </section>
 
-      <!-- DRAG SPLITTER -->
       <div id="splitter" class="splitter" title="Drag to resize"></div>
 
       <section class="panel prompter" id="prompterPanel">
@@ -121,6 +134,26 @@
       </section>
     </main>
 
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-left">© Sansone 2026</div>
+      <a href="#" id="aboutLink" class="footer-link">About</a>
+    </footer>
+
+    <!-- About modal (placeholder; you will provide the text) -->
+    <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div class="modal-title">About</div>
+          <button id="aboutClose" class="btn tiny secondary">Close</button>
+        </div>
+        <div id="aboutContent" class="modal-body">
+          <p>Insert About content here.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Present overlay -->
     <div id="presentOverlay" class="present hidden">
       <div class="present-controls">
         <button id="pPlay" class="btn primary">Play</button>
