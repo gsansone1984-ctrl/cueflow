@@ -1,14 +1,10 @@
 const SLOTS = 5;
-const LS_KEY = "cueflow_slots_v6_html";
-const LS_UI = "cueflow_ui_v2";
-
 const $ = (id) => document.getElementById(id);
 
 /* elements */
 const slotsEl = $("slots");
 const scriptInput = $("scriptInput");
 
-const btnSave = $("btnSave");
 const btnClear = $("btnClear");
 
 const fmtBold = $("fmtBold");
@@ -66,8 +62,8 @@ const pFontVal = $("pFontVal");
 
 const pMirror = $("pMirror");
 
-/* state */
-let slots = loadSlots();
+/* ------------------ state (IN MEMORY ONLY) ------------------ */
+let slots = Array.from({ length: SLOTS }, () => "");
 let activeSlot = 1;
 
 let isPlaying = false;
@@ -79,48 +75,7 @@ let lastTs = null;
 
 let isDragging = false;
 
-/* ---------- storage ---------- */
-function initSlots(){
-  const base = {};
-  for(let i=1;i<=SLOTS;i++) base[i] = "";
-  return base;
-}
-
-function loadSlots(){
-  try{
-    const raw = localStorage.getItem(LS_KEY);
-    if(!raw) return initSlots();
-    const data = JSON.parse(raw);
-    if(!data || typeof data !== "object") return initSlots();
-    return { ...initSlots(), ...data };
-  }catch{
-    return initSlots();
-  }
-}
-
-function saveSlots(){
-  localStorage.setItem(LS_KEY, JSON.stringify(slots));
-}
-
-function loadUI(){
-  try{
-    const raw = localStorage.getItem(LS_UI);
-    if(!raw) return { editorCollapsed:false, editorWidth:420 };
-    const d = JSON.parse(raw);
-    return {
-      editorCollapsed: !!d.editorCollapsed,
-      editorWidth: Number(d.editorWidth) || 420
-    };
-  }catch{
-    return { editorCollapsed:false, editorWidth:420 };
-  }
-}
-
-function saveUI(state){
-  localStorage.setItem(LS_UI, JSON.stringify(state));
-}
-
-/* ---------- tabs ---------- */
+/* ------------------ tabs ------------------ */
 function renderTabs(){
   slotsEl.innerHTML = "";
   for(let i=1;i<=SLOTS;i++){
@@ -140,15 +95,14 @@ function renderTabs(){
 }
 
 function persistActiveHTML(){
-  slots[activeSlot] = scriptInput.innerHTML || "";
-  saveSlots();
+  slots[activeSlot - 1] = scriptInput.innerHTML || "";
 }
 
 function loadActiveHTML(){
-  scriptInput.innerHTML = slots[activeSlot] || "";
+  scriptInput.innerHTML = slots[activeSlot - 1] || "";
 }
 
-/* ---------- sync ---------- */
+/* ------------------ sync ------------------ */
 function syncTeleprompterHTML(){
   const html = scriptInput.innerHTML || "";
   content.innerHTML = html;
@@ -160,19 +114,17 @@ function syncTeleprompterHTML(){
   });
 }
 
-/* ---------- start-from-bottom offsets ---------- */
+/* ------------------ start-from-bottom offsets ------------------ */
 function startOffsetMain(){
-  // testo entra dal basso: spinge il contenuto giù quasi fino al bordo inferiore
   const h = viewerWrap.clientHeight || 0;
   return Math.max(0, h - 70);
 }
-
 function startOffsetPresent(){
   const h = presentView.clientHeight || 0;
   return Math.max(0, h - 140);
 }
 
-/* ---------- scrolling ---------- */
+/* ------------------ scrolling ------------------ */
 function resetScroll(){
   y = 0;
   presentY = 0;
@@ -184,7 +136,6 @@ function clampScroll(){
   const wrapH = viewerWrap.clientHeight;
   const s0 = startOffsetMain();
 
-  // con offset iniziale, la “lunghezza scrollabile” aumenta
   const total = content.scrollHeight + s0;
   const maxY = Math.max(0, total - wrapH + 40);
   y = Math.min(Math.max(y, 0), maxY);
@@ -194,7 +145,6 @@ function clampScroll(){
   const pTotal = presentContent.scrollHeight + ps0;
   const pMaxY = Math.max(0, pTotal - pWrapH + 80);
 
-  // proporzione coerente tra main e present
   const ratio = maxY === 0 ? 0 : (y / maxY);
   presentY = ratio * pMaxY;
   presentY = Math.min(Math.max(presentY, 0), pMaxY);
@@ -204,7 +154,6 @@ function applyScroll(){
   const s0 = startOffsetMain();
   const ps0 = startOffsetPresent();
 
-  // y cresce => contenuto sale. Inizio: offset positivo => testo appare dal basso.
   scrollLayer.style.transform = `translateY(${s0 - y}px)`;
   presentScrollLayer.style.transform = `translateY(${ps0 - presentY}px)`;
 }
@@ -227,7 +176,7 @@ function tick(ts){
   rafId = requestAnimationFrame(tick);
 }
 
-/* ---------- play ---------- */
+/* ------------------ play ------------------ */
 function play(){
   if(isPlaying) return;
   isPlaying = true;
@@ -249,7 +198,7 @@ function togglePlay(){
   isPlaying ? pause() : play();
 }
 
-/* ---------- formatting ---------- */
+/* ------------------ formatting ------------------ */
 function focusEditor(){ scriptInput.focus(); }
 
 function exec(cmd, value = null){
@@ -278,7 +227,7 @@ function clearHighlight(){
   applyHighlight("transparent");
 }
 
-/* ---------- view ---------- */
+/* ------------------ view ------------------ */
 function setFont(px){
   content.style.fontSize = `${px}px`;
   presentContent.style.fontSize = `${Math.max(px, 40) + 16}px`;
@@ -333,32 +282,22 @@ function closePresent(){
   }
 }
 
-/* ---------- collapse editor ---------- */
+/* ------------------ collapse editor (NO persistence) ------------------ */
 function setEditorCollapsed(collapsed){
   document.body.classList.toggle("editor-collapsed", collapsed);
   collapseIcon.textContent = collapsed ? "▶" : "◀";
-
-  const ui = loadUI();
-  saveUI({ ...ui, editorCollapsed: collapsed });
-
-  requestAnimationFrame(() => {
-    clampScroll();
-    applyScroll();
-  });
+  requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
 
 function toggleEditorCollapsed(){
-  const collapsed = document.body.classList.contains("editor-collapsed");
-  setEditorCollapsed(!collapsed);
+  setEditorCollapsed(!document.body.classList.contains("editor-collapsed"));
 }
 
-/* ---------- drag resize ---------- */
+/* ------------------ drag resize (NO persistence) ------------------ */
 function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
 
 function setEditorWidth(px){
   editorPanel.style.flexBasis = `${px}px`;
-  const ui = loadUI();
-  saveUI({ ...ui, editorWidth: px });
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
 
@@ -372,16 +311,13 @@ function startDrag(e){
 function onDragMove(e){
   if(!isDragging) return;
 
-  // calcola larghezza editor in base al mouse X
   const layoutRect = document.getElementById("layout").getBoundingClientRect();
   const x = e.clientX - layoutRect.left;
 
-  // limiti ragionevoli
   const minW = 280;
   const maxW = Math.min(720, layoutRect.width - 260);
 
-  const newW = clamp(x, minW, maxW);
-  setEditorWidth(newW);
+  setEditorWidth(clamp(x, minW, maxW));
 }
 
 function stopDrag(){
@@ -390,15 +326,20 @@ function stopDrag(){
   document.body.classList.remove("dragging");
 }
 
-/* ---------- bindings ---------- */
-btnSave.onclick = persistActiveHTML;
-
-btnClear.onclick = () => {
+/* ------------------ clear (NO persistence) ------------------ */
+function clearAll(){
+  pause();
   scriptInput.innerHTML = "";
-  persistActiveHTML();
+  slots = Array.from({ length: SLOTS }, () => "");
+  activeSlot = 1;
+  renderTabs();
+  loadActiveHTML();
   syncTeleprompterHTML();
   resetScroll();
-};
+}
+
+/* ------------------ bindings ------------------ */
+btnClear.onclick = clearAll;
 
 scriptInput.addEventListener("input", () => {
   persistActiveHTML();
@@ -465,7 +406,7 @@ hlPink.onclick = () => applyHighlight("#FF4FD8");
 hlClear.onclick = clearHighlight;
 
 /* splitter drag events */
-splitter.addEventListener("mousedown", startDrag);
+splitter?.addEventListener("mousedown", startDrag);
 window.addEventListener("mousemove", onDragMove);
 window.addEventListener("mouseup", stopDrag);
 
@@ -499,7 +440,6 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "-"){ fontSize.value = String(Math.max(18, Number(fontSize.value)-2)); fontSize.dispatchEvent(new Event("input")); }
 });
 
-/* resize */
 window.addEventListener("resize", () => {
   requestAnimationFrame(() => {
     clampScroll();
@@ -507,20 +447,21 @@ window.addEventListener("resize", () => {
   });
 });
 
-/* init */
-renderTabs();
-loadActiveHTML();
-syncTeleprompterHTML();
+/* ------------------ init (IMPORTANT: always empty on load) ------------------ */
+function init(){
+  // Ensure nothing is retained on refresh:
+  clearAll();
 
-speedVal.textContent = speed.value;
-fontVal.textContent = fontSize.value;
+  // Default UI:
+  speedVal.textContent = speed.value;
+  fontVal.textContent = fontSize.value;
 
-setFont(Number(fontSize.value));
-setAlign(align.value);
-resetScroll();
+  setFont(Number(fontSize.value));
+  setAlign(align.value);
+  setEditorCollapsed(false);
+  setEditorWidth(420);
+}
 
-/* restore UI state */
-const ui = loadUI();
-setEditorCollapsed(ui.editorCollapsed);
-setEditorWidth(ui.editorWidth);
+init();
+
 
