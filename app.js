@@ -1,10 +1,10 @@
 const SLOTS = 5;
-const LS_KEY = "cueflow_slots_v4_html";
+const LS_KEY = "cueflow_slots_v5_html";
+const LS_UI = "cueflow_ui_v1";
 
-/* ------------------ helpers ------------------ */
 const $ = (id) => document.getElementById(id);
 
-/* ------------------ elements ------------------ */
+/* elements */
 const slotsEl = $("slots");
 const scriptInput = $("scriptInput");
 
@@ -43,6 +43,9 @@ const btnSiteMirror = $("btnSiteMirror");
 const btnFullscreen = $("btnFullscreen");
 const btnPresent = $("btnPresent");
 
+const btnCollapseEditor = $("btnCollapseEditor");
+const collapseIcon = $("collapseIcon");
+
 const presentOverlay = $("presentOverlay");
 const presentView = $("presentView");
 const presentScrollLayer = $("presentScrollLayer");
@@ -60,7 +63,7 @@ const pFontVal = $("pFontVal");
 
 const pMirror = $("pMirror");
 
-/* ------------------ state ------------------ */
+/* state */
 let slots = loadSlots();
 let activeSlot = 1;
 
@@ -71,7 +74,7 @@ let y = 0;
 let presentY = 0;
 let lastTs = null;
 
-/* ------------------ storage ------------------ */
+/* ---------- storage ---------- */
 function initSlots(){
   const base = {};
   for(let i=1;i<=SLOTS;i++) base[i] = "";
@@ -94,7 +97,22 @@ function saveSlots(){
   localStorage.setItem(LS_KEY, JSON.stringify(slots));
 }
 
-/* ------------------ tabs ------------------ */
+function loadUI(){
+  try{
+    const raw = localStorage.getItem(LS_UI);
+    if(!raw) return { editorCollapsed:false };
+    const data = JSON.parse(raw);
+    return { editorCollapsed: !!data.editorCollapsed };
+  }catch{
+    return { editorCollapsed:false };
+  }
+}
+
+function saveUI(state){
+  localStorage.setItem(LS_UI, JSON.stringify(state));
+}
+
+/* ---------- tabs ---------- */
 function renderTabs(){
   slotsEl.innerHTML = "";
   for(let i=1;i<=SLOTS;i++){
@@ -122,7 +140,7 @@ function loadActiveHTML(){
   scriptInput.innerHTML = slots[activeSlot] || "";
 }
 
-/* ------------------ sync ------------------ */
+/* ---------- sync ---------- */
 function syncTeleprompterHTML(){
   const html = scriptInput.innerHTML || "";
   content.innerHTML = html;
@@ -134,7 +152,7 @@ function syncTeleprompterHTML(){
   });
 }
 
-/* ------------------ scrolling ------------------ */
+/* ---------- scrolling ---------- */
 function resetScroll(){
   y = 0;
   presentY = 0;
@@ -180,7 +198,7 @@ function tick(ts){
   rafId = requestAnimationFrame(tick);
 }
 
-/* ------------------ play controls ------------------ */
+/* ---------- play ---------- */
 function play(){
   if(isPlaying) return;
   isPlaying = true;
@@ -202,7 +220,7 @@ function togglePlay(){
   isPlaying ? pause() : play();
 }
 
-/* ------------------ formatting ------------------ */
+/* ---------- formatting ---------- */
 function focusEditor(){ scriptInput.focus(); }
 
 function exec(cmd, value = null){
@@ -231,7 +249,7 @@ function clearHighlight(){
   applyHighlight("transparent");
 }
 
-/* ------------------ view settings ------------------ */
+/* ---------- view ---------- */
 function setFont(px){
   content.style.fontSize = `${px}px`;
   presentContent.style.fontSize = `${Math.max(px, 40) + 16}px`;
@@ -285,7 +303,24 @@ function closePresent(){
   }
 }
 
-/* ------------------ bindings ------------------ */
+/* ---------- collapse editor ---------- */
+function setEditorCollapsed(collapsed){
+  document.body.classList.toggle("editor-collapsed", collapsed);
+  collapseIcon.textContent = collapsed ? "▶" : "◀";
+  saveUI({ editorCollapsed: collapsed });
+  // important: recalc scroll bounds after layout changes
+  requestAnimationFrame(() => {
+    clampScroll();
+    applyScroll();
+  });
+}
+
+function toggleEditorCollapsed(){
+  const collapsed = document.body.classList.contains("editor-collapsed");
+  setEditorCollapsed(!collapsed);
+}
+
+/* ---------- bindings ---------- */
 btnSave.onclick = persistActiveHTML;
 
 btnClear.onclick = () => {
@@ -347,6 +382,8 @@ btnFullscreen.onclick = toggleFullscreen;
 btnPresent.onclick = openPresent;
 pExit.onclick = closePresent;
 
+btnCollapseEditor.onclick = toggleEditorCollapsed;
+
 /* formatting buttons */
 fmtBold.onclick = () => exec("bold");
 fmtItalic.onclick = () => exec("italic");
@@ -360,7 +397,7 @@ hlBlue.onclick = () => applyHighlight("#4F7CFF");
 hlPink.onclick = () => applyHighlight("#FF4FD8");
 hlClear.onclick = clearHighlight;
 
-/* ------------------ keyboard shortcuts ------------------ */
+/* keyboard shortcuts */
 document.addEventListener("keydown", (e) => {
   const inEditor = (e.target && e.target.id) === "scriptInput";
 
@@ -371,7 +408,6 @@ document.addEventListener("keydown", (e) => {
     if(k === "u"){ e.preventDefault(); exec("underline"); }
     return;
   }
-
   if(inEditor) return;
 
   if(e.code === "Space"){ e.preventDefault(); togglePlay(); }
@@ -391,7 +427,15 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "-"){ fontSize.value = String(Math.max(18, Number(fontSize.value)-2)); fontSize.dispatchEvent(new Event("input")); }
 });
 
-/* ------------------ init ------------------ */
+/* window resize: keep scroll bounds correct */
+window.addEventListener("resize", () => {
+  requestAnimationFrame(() => {
+    clampScroll();
+    applyScroll();
+  });
+});
+
+/* init */
 renderTabs();
 loadActiveHTML();
 syncTeleprompterHTML();
@@ -402,4 +446,9 @@ fontVal.textContent = fontSize.value;
 setFont(Number(fontSize.value));
 setAlign(align.value);
 resetScroll();
+
+/* restore UI state */
+const ui = loadUI();
+setEditorCollapsed(ui.editorCollapsed);
+
 
