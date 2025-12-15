@@ -7,137 +7,252 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div id="appRoot">
+  <div id="appRoot">
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-logo" src="logo.svg" alt="CueFlow logo" />
+        <div class="brand-text">
+          <div class="brand-name">CueFlow</div>
+          <div class="brand-sub">Teleprompter for creators</div>
+        </div>
+      </div>
 
-<header class="topbar">
-  <div class="brand">
-    <img class="brand-logo" src="logo.svg" alt="CueFlow logo" />
-    <div class="brand-text">
-      <div class="brand-name">CueFlow</div>
-      <div class="brand-sub">Teleprompter for creators</div>
-    </div>
-  </div>
+      <!-- MOBILE VIEW SWITCH -->
+      <div class="view-switch" id="viewSwitch" aria-label="View switch">
+        <button id="btnViewEdit" class="switch-btn active" type="button">Edit Script</button>
+        <button id="btnViewPrompt" class="switch-btn" type="button">Teleprompter</button>
+      </div>
 
-  <div class="view-switch" id="viewSwitch">
-    <button id="btnViewEdit" class="switch-btn active">Edit Script</button>
-    <button id="btnViewPrompt" class="switch-btn">Teleprompter</button>
-  </div>
+      <!-- Desktop actions -->
+      <div class="top-actions" id="topActions">
+        <button id="btnMirror" class="action-btn" title="Mirror prompt (M)">Mirror</button>
+        <button id="btnSiteMirror" class="action-btn" title="Mirror whole site (Shift+M)">Site Mirror</button>
+        <button id="btnFullscreen" class="action-btn" title="Fullscreen (F)">Fullscreen</button>
+        <button id="btnPresent" class="action-btn primary" title="Present mode">Present</button>
+      </div>
 
-  <div class="top-actions">
-    <button id="btnMirror" class="action-btn">Mirror</button>
-    <button id="btnSiteMirror" class="action-btn">Site Mirror</button>
-    <button id="btnFullscreen" class="action-btn">Fullscreen</button>
-    <button id="btnPresent" class="action-btn primary">Present</button>
-  </div>
+      <!-- Mobile/tablet menu button -->
+      <button id="btnMenu" class="menu-btn" aria-expanded="false" aria-controls="mobileMenu">
+        Menu ▾
+      </button>
 
-  <button id="btnMenu" class="menu-btn">Menu ▾</button>
+      <!-- Mobile/tablet dropdown -->
+      <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Main menu">
+        <button id="mBtnMirror" class="menu-item" role="menuitem">Mirror</button>
+        <button id="mBtnSiteMirror" class="menu-item" role="menuitem">Site Mirror</button>
+        <button id="mBtnFullscreen" class="menu-item" role="menuitem">Fullscreen</button>
+        <button id="mBtnPresent" class="menu-item primary" role="menuitem">Present</button>
+      </div>
+    </header>
 
-  <div id="mobileMenu" class="mobile-menu hidden">
-    <button id="mBtnMirror" class="menu-item">Mirror</button>
-    <button id="mBtnSiteMirror" class="menu-item">Site Mirror</button>
-    <button id="mBtnFullscreen" class="menu-item">Fullscreen</button>
-    <button id="mBtnPresent" class="menu-item primary">Present</button>
-  </div>
-</header>
+    <main class="layout" id="layout">
+      <section class="panel editor" id="editorPanel">
+        <div class="panel-head">
+          <div class="panel-title">Script</div>
+          <button id="btnCollapseEditor" class="collapse-btn" title="Collapse Script panel">
+            <span id="collapseIcon">◀</span>
+          </button>
+        </div>
 
-<main class="layout">
+        <div class="tabs" id="slots"></div>
 
-<section class="panel editor" id="editorPanel">
-  <div class="panel-title">Script</div>
-  <div id="scriptInput" class="rte" contenteditable="true"></div>
-  <button id="btnClear" class="btn danger">Clear</button>
-</section>
+        <div class="formatbar">
+          <button class="btn tiny" id="fmtBold" title="Bold"><span class="kbd">B</span></button>
+          <button class="btn tiny" id="fmtItalic" title="Italic"><span class="kbd">I</span></button>
+          <button class="btn tiny" id="fmtUnderline" title="Underline"><span class="kbd">U</span></button>
 
-<section class="panel prompter" id="prompterPanel">
-  <div class="panel-title">Teleprompter</div>
-  <div class="controls">
-    <button id="btnPlay" class="btn primary">Play</button>
-    <button id="btnReset" class="btn">Reset</button>
-  </div>
+          <div class="sep"></div>
 
-  <div class="viewer-wrap" id="viewerWrap">
-    <div class="viewer">
-      <div id="scrollLayer" class="scroll-layer">
-        <div id="content" class="content"></div>
+          <div class="group">
+            <span class="label">Text</span>
+            <button class="btn tiny chip" id="tcYellow" title="Text color: Yellow">Yellow</button>
+            <button class="btn tiny chip" id="tcGreen" title="Text color: Green">Green</button>
+            <button class="btn tiny secondary" id="tcReset" title="Text color: Default">Reset</button>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="group">
+            <span class="label">Highlight</span>
+            <button class="btn tiny chip hl blue" id="hlBlue" title="Highlight Blue">Blue</button>
+            <button class="btn tiny chip hl pink" id="hlPink" title="Highlight Pink">Pink</button>
+            <button class="btn tiny secondary" id="hlClear" title="Remove highlight">Clear</button>
+          </div>
+        </div>
+
+        <div id="scriptInput" class="rte" contenteditable="true" spellcheck="false" aria-label="Script editor"></div>
+
+        <div class="row">
+          <button id="btnClear" class="btn danger">Clear</button>
+        </div>
+
+        <div class="hint">
+          Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · Shift+M site mirror · R reset · Ctrl+B/I/U formatting
+        </div>
+      </section>
+
+      <div id="splitter" class="splitter" title="Drag to resize"></div>
+
+      <section class="panel prompter" id="prompterPanel">
+        <div class="panel-title">Teleprompter</div>
+
+        <div class="controls">
+          <button id="btnPlay" class="btn primary">Play</button>
+          <button id="btnReset" class="btn secondary">Reset</button>
+
+          <div class="control-group">
+            <label>Speed</label>
+            <input id="speed" type="range" min="5" max="200" value="60" />
+            <span id="speedVal" class="mono">60</span>
+          </div>
+
+          <div class="control-group">
+            <label>Text</label>
+            <input id="fontSize" type="range" min="18" max="72" value="40" />
+            <span id="fontVal" class="mono">40</span>
+          </div>
+
+          <div class="control-group">
+            <label>Align</label>
+            <select id="align">
+              <option value="left">Left</option>
+              <option value="center" selected>Center</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="viewer-wrap" id="viewerWrap">
+          <div class="viewer" id="viewer">
+            <div id="scrollLayer" class="scroll-layer">
+              <div id="content" class="content"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-left">© Sansone 2026</div>
+      <a href="#" id="aboutLink" class="footer-link">About</a>
+    </footer>
+
+    <!-- About modal -->
+    <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div class="modal-title">About</div>
+          <button id="aboutClose" class="btn tiny secondary">Close</button>
+        </div>
+
+        <div class="about-header">
+          <img class="about-avatar" src="giuseppe-sansone.jpg" alt="Giuseppe Sansone" />
+          <div class="about-identity">
+            <div class="about-name">Giuseppe Sansone</div>
+            <div class="about-role">Creator • Logistics & Supply Chain</div>
+          </div>
+        </div>
+
+        <div id="aboutContent" class="modal-body">
+          <div class="about-block">
+            <p>
+              I built <strong>CueFlow</strong> because I needed a simple, clean teleprompter that matched the way I work.
+              I tried several tools, but none had the exact features and workflow I wanted for my videos.
+            </p>
+
+            <p>
+              So I built the teleprompter I wanted to use: fast, distraction-free, and designed to work smoothly on
+              <strong>phone, tablet, and desktop</strong>.
+            </p>
+
+            <p class="about-sign">
+              Thanks for stopping by.<br />
+              <span class="sig">— Giuseppe Sansone</span>
+            </p>
+
+            <hr class="about-hr" />
+
+            <h3>Free to use</h3>
+            <p>
+              CueFlow is <strong>free</strong> and will stay free.
+              If you find it useful, share it with someone who records videos, teaches online, or creates content.
+            </p>
+
+            <hr class="about-hr" />
+
+            <h3>Optional donation (for charity)</h3>
+            <p>
+              If you’d like, you can leave an <strong>optional donation</strong>.
+              Every donation will be forwarded to a selected charity and I will publish a simple transparency log
+              (date, amount received, amount donated, and proof of transfer).
+            </p>
+            <p class="about-small">
+              Note: donations are optional and do not unlock features. CueFlow works the same for everyone.
+            </p>
+
+            <hr class="about-hr" />
+
+            <h3>Colophon</h3>
+            <p>
+              CueFlow is built with plain <strong>HTML, CSS and JavaScript</strong>.
+              It’s deployed as a <strong>Progressive Web App (PWA)</strong> so you can add it to your home screen.
+              On iOS, use “Add to Home Screen”. On Android, your browser may prompt you to install it.
+            </p>
+
+            <hr class="about-hr" />
+
+            <h3>Privacy</h3>
+            <p>
+              The words you type or paste into CueFlow are <strong>not saved</strong> and are <strong>not sent</strong> anywhere.
+              When you refresh the page, your script is cleared.
+              CueFlow does not use ads, and it does not store personal profiles.
+            </p>
+
+            <hr class="about-hr" />
+
+            <h3>Contact</h3>
+            <p>
+              Connect with me on LinkedIn:
+              <a class="about-link" href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank" rel="noopener noreferrer">
+                Giuseppe Sansone
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
 
-</main>
+    <!-- Present overlay -->
+    <div id="presentOverlay" class="present hidden">
+      <div class="present-controls">
+        <button id="pPlay" class="btn primary">Play</button>
+        <button id="pReset" class="btn secondary">Reset</button>
+        <button id="pExit" class="btn danger">Exit</button>
 
-<footer class="footer">
-  <span>© Sansone 2026</span>
-  <a href="#" id="aboutLink">About</a>
-</footer>
+        <div class="mini">
+          <span class="tag">Speed</span>
+          <input id="pSpeed" type="range" min="5" max="200" value="60" />
+          <span id="pSpeedVal" class="mono">60</span>
+        </div>
 
-<!-- ABOUT MODAL -->
-<div id="aboutModal" class="modal hidden">
-  <div class="modal-card">
+        <div class="mini">
+          <span class="tag">Text</span>
+          <input id="pFont" type="range" min="18" max="96" value="56" />
+          <span id="pFontVal" class="mono">56</span>
+        </div>
 
-    <div class="about-header">
-      <img src="giuseppe-sansone.jpg" class="about-avatar" alt="Giuseppe Sansone">
-      <div>
-        <div class="about-name">Giuseppe Sansone</div>
-        <div class="about-role">Creator • Logistics & Supply Chain</div>
+        <button id="pMirror" class="btn secondary">Mirror</button>
+      </div>
+
+      <div class="present-view" id="presentView">
+        <div id="presentScrollLayer" class="present-scroll-layer">
+          <div id="presentContent" class="present-content"></div>
+        </div>
       </div>
     </div>
 
-    <div class="about-block">
-      <p>
-        I built <strong>CueFlow</strong> because I needed a simple, clean teleprompter that matched the way I work.
-        I tried several tools, but none had the exact features and workflow I wanted.
-      </p>
-
-      <p>
-        So I built the teleprompter I wanted to use: fast, distraction-free, and designed to work smoothly on
-        phone, tablet, and desktop.
-      </p>
-
-      <p class="about-sign">
-        Thanks for stopping by.<br>
-        — Giuseppe Sansone
-      </p>
-
-      <hr>
-
-      <h3>Free to use</h3>
-      <p>
-        CueFlow is free and will stay free.  
-        If you find it useful, feel free to share it with others.
-      </p>
-
-      <hr>
-
-      <h3>Optional donation (for charity)</h3>
-      <p>
-        If you wish, you can leave an optional donation.  
-        All donations will be forwarded to charity and documented transparently.
-      </p>
-
-      <hr>
-
-      <h3>Privacy</h3>
-      <p>
-        Nothing you type is saved or tracked.  
-        Refreshing the page clears everything.
-      </p>
-
-      <hr>
-
-      <h3>Contact</h3>
-      <p>
-        <a href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank">
-          Connect with me on LinkedIn
-        </a>
-      </p>
-    </div>
-
-    <button id="aboutClose" class="btn">Close</button>
   </div>
-</div>
 
-<script src="app.js"></script>
-</div>
+  <script src="app.js"></script>
 </body>
 </html>
