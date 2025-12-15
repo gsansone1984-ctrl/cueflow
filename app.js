@@ -29,9 +29,6 @@ const fontVal = $("fontVal");
 
 const align = $("align");
 
-const editorPanel = $("editorPanel");
-const splitter = $("splitter");
-
 const viewerWrap = $("viewerWrap");
 const scrollLayer = $("scrollLayer");
 const content = $("content");
@@ -50,7 +47,6 @@ const mBtnFullscreen = $("mBtnFullscreen");
 const mBtnPresent = $("mBtnPresent");
 
 /* view switch */
-const viewSwitch = $("viewSwitch");
 const btnViewEdit = $("btnViewEdit");
 const btnViewPrompt = $("btnViewPrompt");
 
@@ -77,7 +73,7 @@ const pFont = $("pFont");
 const pFontVal = $("pFontVal");
 const pMirror = $("pMirror");
 
-/* ------------------ state (NO persistence) ------------------ */
+/* state (NO persistence) */
 let slots = Array.from({ length: SLOTS }, () => "");
 let activeSlot = 1;
 
@@ -87,16 +83,13 @@ let y = 0;
 let presentY = 0;
 let lastTs = null;
 
-let isDragging = false;
-let editorWidthPx = 440;
-
 /* breakpoint aligned to CSS */
 function isSmall() {
   return window.matchMedia("(max-width: 1100px)").matches;
 }
 function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
 
-/* ------------------ view switch (tablet/phone) ------------------ */
+/* mobile view */
 function setMobileView(mode){ // "edit" | "prompt"
   if(!isSmall()) return;
 
@@ -108,7 +101,6 @@ function setMobileView(mode){ // "edit" | "prompt"
 
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
-
 function ensureMode(){
   if(isSmall()){
     if(!document.body.classList.contains("mobile-view-edit") &&
@@ -120,7 +112,7 @@ function ensureMode(){
   }
 }
 
-/* ------------------ tabs ------------------ */
+/* tabs */
 function renderTabs(){
   slotsEl.innerHTML = "";
   for(let i=1;i<=SLOTS;i++){
@@ -139,15 +131,10 @@ function renderTabs(){
     slotsEl.appendChild(b);
   }
 }
+function persistActive(){ slots[activeSlot - 1] = scriptInput.innerHTML || ""; }
+function loadActive(){ scriptInput.innerHTML = slots[activeSlot - 1] || ""; }
 
-function persistActive(){
-  slots[activeSlot - 1] = scriptInput.innerHTML || "";
-}
-function loadActive(){
-  scriptInput.innerHTML = slots[activeSlot - 1] || "";
-}
-
-/* ------------------ syncing ------------------ */
+/* syncing */
 function syncPrompter(){
   const html = scriptInput.innerHTML || "";
   content.innerHTML = html;
@@ -155,7 +142,7 @@ function syncPrompter(){
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
 
-/* ------------------ start-from-bottom offsets ------------------ */
+/* start from bottom */
 function mainViewerH(){
   const h = viewerWrap?.clientHeight || 0;
   return h > 50 ? h : Math.floor(window.innerHeight * 0.6);
@@ -167,12 +154,11 @@ function presentViewerH(){
 function startOffsetMain(){ return Math.max(0, mainViewerH() - 70); }
 function startOffsetPresent(){ return Math.max(0, presentViewerH() - 140); }
 
-/* ------------------ scrolling ------------------ */
+/* scrolling */
 function resetScroll(){
   y = 0; presentY = 0; lastTs = null;
   applyScroll();
 }
-
 function clampScroll(){
   const wrapH = mainViewerH();
   const s0 = startOffsetMain();
@@ -190,14 +176,13 @@ function clampScroll(){
   presentY = ratio * pMaxY;
   presentY = Math.min(Math.max(presentY, 0), pMaxY);
 }
-
 function applyScroll(){
   scrollLayer.style.transform = `translateY(${startOffsetMain() - y}px)`;
   presentScrollLayer.style.transform = `translateY(${startOffsetPresent() - presentY}px)`;
 }
 
+/* play */
 function pxPerSec(){ return Number(speed.value) * 6; }
-
 function tick(ts){
   if(!isPlaying) return;
   if(lastTs === null) lastTs = ts;
@@ -209,7 +194,6 @@ function tick(ts){
   applyScroll();
   rafId = requestAnimationFrame(tick);
 }
-
 function play(){
   if(isPlaying) return;
   isPlaying = true;
@@ -232,9 +216,8 @@ function togglePlay(){
   isPlaying ? pause() : play();
 }
 
-/* ------------------ formatting ------------------ */
+/* formatting */
 function focusEditor(){ scriptInput.focus(); }
-
 function exec(cmd){
   focusEditor();
   document.execCommand(cmd, false, null);
@@ -255,7 +238,7 @@ function applyHighlight(color){
   syncPrompter();
 }
 
-/* ------------------ view tools ------------------ */
+/* view tools */
 function setFont(px){
   content.style.fontSize = `${px}px`;
   presentContent.style.fontSize = `${Math.max(px, 40) + 16}px`;
@@ -280,7 +263,7 @@ function toggleFullscreen(){
   }
 }
 
-/* ------------------ present ------------------ */
+/* present */
 function openPresent(){
   persistActive();
   syncPrompter();
@@ -299,12 +282,10 @@ function openPresent(){
 }
 function closePresent(){
   presentOverlay.classList.add("hidden");
-  if(document.fullscreenElement){
-    document.exitFullscreen?.();
-  }
+  if(document.fullscreenElement) document.exitFullscreen?.();
 }
 
-/* ------------------ desktop collapse + drag resize ------------------ */
+/* collapse (desktop) */
 function setEditorCollapsed(collapsed){
   document.body.classList.toggle("editor-collapsed", collapsed);
   collapseIcon.textContent = collapsed ? "▶" : "◀";
@@ -314,41 +295,7 @@ function toggleEditorCollapsed(){
   setEditorCollapsed(!document.body.classList.contains("editor-collapsed"));
 }
 
-function getMaxEditorWidth(){
-  const layout = document.getElementById("layout");
-  if(!layout) return 760;
-  const r = layout.getBoundingClientRect();
-  const maxW = Math.min(760, r.width - 320);
-  return Math.max(320, maxW);
-}
-function setEditorWidth(px){
-  const minW = 320;
-  const maxW = getMaxEditorWidth();
-  editorWidthPx = clamp(px, minW, maxW);
-  editorPanel.style.flexBasis = `${editorWidthPx}px`;
-  requestAnimationFrame(() => { clampScroll(); applyScroll(); });
-}
-
-function startDrag(e){
-  if(isSmall()) return;
-  if(document.body.classList.contains("editor-collapsed")) return;
-  isDragging = true;
-  document.body.classList.add("dragging");
-  e.preventDefault();
-}
-function onDragMove(e){
-  if(!isDragging) return;
-  const layoutRect = document.getElementById("layout").getBoundingClientRect();
-  const x = e.clientX - layoutRect.left;
-  setEditorWidth(x);
-}
-function stopDrag(){
-  if(!isDragging) return;
-  isDragging = false;
-  document.body.classList.remove("dragging");
-}
-
-/* ------------------ menu + modal ------------------ */
+/* menu + about */
 function openMobileMenu(){
   mobileMenu.classList.remove("hidden");
   btnMenu.setAttribute("aria-expanded", "true");
@@ -366,11 +313,9 @@ function openAbout(e){
   aboutModal.classList.remove("hidden");
   closeMobileMenu();
 }
-function closeAbout(){
-  aboutModal.classList.add("hidden");
-}
+function closeAbout(){ aboutModal.classList.add("hidden"); }
 
-/* ------------------ clear (no saving) ------------------ */
+/* clear */
 function clearAll(){
   pause();
   scriptInput.innerHTML = "";
@@ -385,7 +330,7 @@ function clearAll(){
   if(isSmall()) setMobileView("edit");
 }
 
-/* ------------------ bindings ------------------ */
+/* bindings */
 btnClear.onclick = clearAll;
 scriptInput.addEventListener("input", () => { persistActive(); syncPrompter(); });
 
@@ -397,25 +342,20 @@ speed.addEventListener("input", () => {
   pSpeed.value = speed.value;
   pSpeedVal.textContent = speed.value;
 });
-
 fontSize.addEventListener("input", () => {
   fontVal.textContent = fontSize.value;
   setFont(Number(fontSize.value));
   pFont.value = Math.max(Number(fontSize.value), 40) + 16;
   pFontVal.textContent = pFont.value;
 });
-
 align.addEventListener("change", () => setAlign(align.value));
 
-/* toolbar buttons */
 fmtBold.onclick = () => exec("bold");
 fmtItalic.onclick = () => exec("italic");
 fmtUnderline.onclick = () => exec("underline");
-
 tcYellow.onclick = () => setTextColor("#FFD400");
 tcGreen.onclick = () => setTextColor("#00FF7B");
 tcReset.onclick = () => setTextColor("#FFFFFF");
-
 hlBlue.onclick = () => applyHighlight("#4F7CFF");
 hlPink.onclick = () => applyHighlight("#FF4FD8");
 hlClear.onclick = () => applyHighlight("transparent");
@@ -426,7 +366,7 @@ btnSiteMirror.onclick = toggleSiteMirror;
 btnFullscreen.onclick = toggleFullscreen;
 btnPresent.onclick = openPresent;
 
-/* menu */
+/* menu actions */
 btnMenu.onclick = toggleMobileMenu;
 mBtnMirror.onclick = () => { toggleMirror(); closeMobileMenu(); };
 mBtnSiteMirror.onclick = () => { toggleSiteMirror(); closeMobileMenu(); };
@@ -443,15 +383,15 @@ document.addEventListener("click", (e) => {
 btnViewEdit.onclick = () => setMobileView("edit");
 btnViewPrompt.onclick = () => setMobileView("prompt");
 
-/* collapse desktop */
+/* collapse */
 btnCollapseEditor.onclick = toggleEditorCollapsed;
 
-/* About */
+/* about */
 aboutLink.onclick = openAbout;
 aboutClose.onclick = closeAbout;
 aboutModal.addEventListener("click", (e) => { if(e.target === aboutModal) closeAbout(); });
 
-/* Present bindings */
+/* present */
 pPlay.onclick = togglePlay;
 pReset.onclick = () => { pause(); resetScroll(); };
 pExit.onclick = closePresent;
@@ -469,11 +409,6 @@ pFont.addEventListener("input", () => {
   fontVal.textContent = fontSize.value;
   setFont(mainPx);
 });
-
-/* drag resize (desktop) */
-splitter?.addEventListener("mousedown", startDrag);
-window.addEventListener("mousemove", onDragMove);
-window.addEventListener("mouseup", stopDrag);
 
 /* shortcuts */
 document.addEventListener("keydown", (e) => {
@@ -500,17 +435,12 @@ document.addEventListener("keydown", (e) => {
 /* resize */
 window.addEventListener("resize", () => {
   ensureMode();
-  if(!isSmall() && !document.body.classList.contains("editor-collapsed")){
-    setEditorWidth(editorWidthPx);
-  }
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 });
 
 /* init */
 function init(){
-  // Always start empty (no saving)
   clearAll();
-
   speedVal.textContent = speed.value;
   fontVal.textContent = fontSize.value;
 
@@ -518,10 +448,8 @@ function init(){
   setAlign(align.value);
 
   setEditorCollapsed(false);
-  setEditorWidth(editorWidthPx);
 
   ensureMode();
   if(isSmall()) setMobileView("edit");
 }
-
 init();
