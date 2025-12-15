@@ -49,6 +49,11 @@ const mBtnSiteMirror = $("mBtnSiteMirror");
 const mBtnFullscreen = $("mBtnFullscreen");
 const mBtnPresent = $("mBtnPresent");
 
+/* mobile view switch */
+const viewSwitch = $("viewSwitch");
+const btnViewEdit = $("btnViewEdit");
+const btnViewPrompt = $("btnViewPrompt");
+
 const btnCollapseEditor = $("btnCollapseEditor");
 const collapseIcon = $("collapseIcon");
 
@@ -88,11 +93,41 @@ let lastTs = null;
 
 let isDragging = false;
 
-/* editor width state (for resize clamp) */
+/* editor width state (desktop) */
 let editorWidthPx = 420;
 
 /* ------------------ helpers ------------------ */
 function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+function isMobileLayout(){ return window.matchMedia("(max-width: 1024px)").matches; }
+
+/* ------------------ mobile view mode ------------------ */
+function setMobileView(mode){ // "edit" | "prompt"
+  if(!isMobileLayout()) return;
+
+  document.body.classList.toggle("mobile-view-edit", mode === "edit");
+  document.body.classList.toggle("mobile-view-prompt", mode === "prompt");
+
+  btnViewEdit?.classList.toggle("active", mode === "edit");
+  btnViewPrompt?.classList.toggle("active", mode === "prompt");
+
+  requestAnimationFrame(() => { clampScroll(); applyScroll(); });
+}
+
+function ensureMobileDefaults(){
+  if(isMobileLayout()){
+    // default to editor view
+    if(!document.body.classList.contains("mobile-view-edit") &&
+       !document.body.classList.contains("mobile-view-prompt")){
+      document.body.classList.add("mobile-view-edit");
+    }
+    // show switch
+    viewSwitch && (viewSwitch.style.display = "flex");
+  }else{
+    // desktop: remove mobile view classes
+    document.body.classList.remove("mobile-view-edit","mobile-view-prompt");
+    viewSwitch && (viewSwitch.style.display = "none");
+  }
+}
 
 /* ------------------ tabs ------------------ */
 function renderTabs(){
@@ -133,7 +168,7 @@ function syncTeleprompterHTML(){
   });
 }
 
-/* ------------------ viewer height safe (fix black screen on mobile/tablet) ------------------ */
+/* ------------------ viewer height safe ------------------ */
 function getMainViewerHeight(){
   const h = viewerWrap?.clientHeight || 0;
   if(h > 50) return h;
@@ -226,6 +261,10 @@ function pause(){
 }
 
 function togglePlay(){
+  // on mobile/tablet, when pressing Play: switch to Teleprompter view
+  if(isMobileLayout() && !document.body.classList.contains("mobile-view-prompt")){
+    setMobileView("prompt");
+  }
   isPlaying ? pause() : play();
 }
 
@@ -315,7 +354,7 @@ function closePresent(){
   }
 }
 
-/* ------------------ collapse editor ------------------ */
+/* ------------------ collapse editor (desktop only) ------------------ */
 function setEditorCollapsed(collapsed){
   document.body.classList.toggle("editor-collapsed", collapsed);
   collapseIcon.textContent = collapsed ? "▶" : "◀";
@@ -326,12 +365,12 @@ function toggleEditorCollapsed(){
   setEditorCollapsed(!document.body.classList.contains("editor-collapsed"));
 }
 
-/* ------------------ drag resize + clamp on resize ------------------ */
+/* ------------------ drag resize (desktop) ------------------ */
 function getMaxEditorWidth(){
   const layout = document.getElementById("layout");
   if(!layout) return 720;
   const r = layout.getBoundingClientRect();
-  const maxW = Math.min(720, r.width - 260); // garantisce spazio al prompter
+  const maxW = Math.min(720, r.width - 260);
   return Math.max(280, maxW);
 }
 
@@ -346,6 +385,7 @@ function setEditorWidth(px){
 }
 
 function startDrag(e){
+  if(isMobileLayout()) return;
   if(document.body.classList.contains("editor-collapsed")) return;
   isDragging = true;
   document.body.classList.add("dragging");
@@ -401,6 +441,7 @@ function clearAll(){
   resetScroll();
   closeMobileMenu();
   closeAbout();
+  if(isMobileLayout()) setMobileView("edit");
 }
 
 /* ------------------ bindings ------------------ */
@@ -412,7 +453,7 @@ scriptInput.addEventListener("input", () => {
 });
 
 btnPlay.onclick = togglePlay;
-pPlay.onclick = togglePlay;
+pPlay.onclick = () => { togglePlay(); };
 
 btnReset.onclick = () => { pause(); resetScroll(); };
 pReset.onclick = () => { pause(); resetScroll(); };
@@ -459,6 +500,10 @@ mBtnMirror.onclick = () => { toggleMirror(); closeMobileMenu(); };
 mBtnSiteMirror.onclick = () => { toggleSiteMirror(); closeMobileMenu(); };
 mBtnFullscreen.onclick = () => { toggleFullscreen(); closeMobileMenu(); };
 mBtnPresent.onclick = openPresent;
+
+/* view switch */
+btnViewEdit.onclick = () => setMobileView("edit");
+btnViewPrompt.onclick = () => setMobileView("prompt");
 
 /* close menu on outside click */
 document.addEventListener("click", (e) => {
@@ -518,25 +563,23 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "f" || e.key === "F"){ toggleFullscreen(); }
   if(e.key === "r" || e.key === "R"){ pause(); resetScroll(); }
   if(e.key === "Escape"){ closeMobileMenu(); closeAbout(); }
-
-  if(e.key === "ArrowUp"){ speed.value = String(Math.min(200, Number(speed.value)+5)); speed.dispatchEvent(new Event("input")); }
-  if(e.key === "ArrowDown"){ speed.value = String(Math.max(5, Number(speed.value)-5)); speed.dispatchEvent(new Event("input")); }
-  if(e.key === "+"){ fontSize.value = String(Math.min(72, Number(fontSize.value)+2)); fontSize.dispatchEvent(new Event("input")); }
-  if(e.key === "-"){ fontSize.value = String(Math.max(18, Number(fontSize.value)-2)); fontSize.dispatchEvent(new Event("input")); }
 });
 
-/* resize: clamp editor width + recalcoli scroll (fix mobile black) */
+/* resize: clamp desktop editor width + set mobile defaults */
 window.addEventListener("resize", () => {
-  if(!document.body.classList.contains("editor-collapsed")){
+  ensureMobileDefaults();
+
+  if(!isMobileLayout() && !document.body.classList.contains("editor-collapsed")){
     setEditorWidth(editorWidthPx);
   }
+
   requestAnimationFrame(() => {
     clampScroll();
     applyScroll();
   });
 });
 
-/* init: always empty on load (no saving) */
+/* init: always empty on load */
 function init(){
   clearAll();
 
@@ -551,6 +594,9 @@ function init(){
 
   closeMobileMenu();
   closeAbout();
+
+  ensureMobileDefaults();
+  if(isMobileLayout()) setMobileView("edit");
 }
 
 init();
