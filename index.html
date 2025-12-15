@@ -34,8 +34,13 @@
     </header>
 
     <main class="layout" id="layout">
-      <section class="panel editor">
-        <div class="panel-title">Script</div>
+      <section class="panel editor" id="editorPanel">
+        <div class="panel-head">
+          <div class="panel-title">Script</div>
+          <button id="btnCollapseEditor" class="collapse-btn" title="Collapse Script panel">
+            <span id="collapseIcon">◀</span>
+          </button>
+        </div>
 
         <div class="tabs" id="slots"></div>
 
@@ -71,11 +76,11 @@
         </div>
 
         <div class="hint">
-          Viewer shortcuts: Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · Shift+M site mirror · R reset
+          Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · Shift+M site mirror · R reset · Ctrl+B/I/U formatting
         </div>
       </section>
 
-      <section class="panel prompter">
+      <section class="panel prompter" id="prompterPanel">
         <div class="panel-title">Teleprompter</div>
 
         <div class="controls">
