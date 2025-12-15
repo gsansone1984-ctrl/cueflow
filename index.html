@@ -17,13 +17,13 @@
         </div>
       </div>
 
-      <!-- Tablet/Phone: view switch (one view at a time) -->
+      <!-- Tablet/Phone: switch -->
       <div class="view-switch" id="viewSwitch" aria-label="View switch">
         <button id="btnViewEdit" class="switch-btn active" type="button">Edit Script</button>
         <button id="btnViewPrompt" class="switch-btn" type="button">Teleprompter</button>
       </div>
 
-      <!-- Desktop: actions -->
+      <!-- Desktop actions -->
       <div class="top-actions" id="topActions">
         <button id="btnMirror" class="action-btn" type="button">Mirror</button>
         <button id="btnSiteMirror" class="action-btn" type="button">Site Mirror</button>
@@ -31,16 +31,23 @@
         <button id="btnPresent" class="action-btn primary" type="button">Present</button>
       </div>
 
-      <!-- Tablet/Phone: dropdown menu -->
-      <button id="btnMenu" class="menu-btn" type="button" aria-expanded="false" aria-controls="mobileMenu">
-        Menu ▾
-      </button>
+      <!-- Right side: copyright + about + menu -->
+      <div class="top-right">
+        <div class="top-meta">
+          <span class="copyright">© Sansone 2026</span>
+          <a href="#" id="aboutLink" class="about-top">About</a>
+        </div>
 
-      <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Menu">
-        <button id="mBtnMirror" class="menu-item" role="menuitem" type="button">Mirror</button>
-        <button id="mBtnSiteMirror" class="menu-item" role="menuitem" type="button">Site Mirror</button>
-        <button id="mBtnFullscreen" class="menu-item" role="menuitem" type="button">Fullscreen</button>
-        <button id="mBtnPresent" class="menu-item primary" role="menuitem" type="button">Present</button>
+        <button id="btnMenu" class="menu-btn" type="button" aria-expanded="false" aria-controls="mobileMenu">
+          Menu ▾
+        </button>
+
+        <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Menu">
+          <button id="mBtnMirror" class="menu-item" role="menuitem" type="button">Mirror</button>
+          <button id="mBtnSiteMirror" class="menu-item" role="menuitem" type="button">Site Mirror</button>
+          <button id="mBtnFullscreen" class="menu-item" role="menuitem" type="button">Fullscreen</button>
+          <button id="mBtnPresent" class="menu-item primary" role="menuitem" type="button">Present</button>
+        </div>
       </div>
     </header>
 
@@ -87,9 +94,6 @@
         <div class="hint">No saving. Refresh clears everything.</div>
       </section>
 
-      <!-- Desktop splitter -->
-      <div id="splitter" class="splitter" title="Drag to resize"></div>
-
       <!-- TELEPROMPTER -->
       <section class="panel prompter" id="prompterPanel">
         <div class="panel-title">Teleprompter</div>
@@ -129,11 +133,6 @@
         </div>
       </section>
     </main>
-
-    <footer class="footer">
-      <div>© Sansone 2026</div>
-      <a href="#" id="aboutLink" class="footer-link">About</a>
-    </footer>
 
     <!-- ABOUT -->
     <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
@@ -177,9 +176,7 @@
           <hr class="about-hr" />
 
           <h3>Privacy</h3>
-          <p>
-            Your text is not saved and not sent anywhere. Refreshing the page clears everything.
-          </p>
+          <p>Your text is not saved and not sent anywhere. Refreshing the page clears everything.</p>
 
           <hr class="about-hr" />
 
@@ -226,5 +223,8 @@
   </div>
 
   <script src="app.js"></script>
+</body>
+</html>
+
 </body>
 </html>
