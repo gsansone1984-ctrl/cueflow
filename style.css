@@ -38,6 +38,7 @@ body.site-mirrored #appRoot{
 .topbar{
   flex:0 0 auto;
   display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
   padding:14px 16px;
   border-bottom:1px solid var(--border);
   background:#000;
@@ -69,6 +70,33 @@ body.site-mirrored #appRoot{
   background: linear-gradient(90deg, rgba(255,212,0,.18), rgba(255,184,0,.14));
 }
 
+/* view switch (mobile only) */
+.view-switch{
+  display:none;
+  gap:8px;
+  align-items:center;
+  padding:6px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  background: rgba(255,255,255,.04);
+}
+.switch-btn{
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.86);
+  padding:8px 10px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:900;
+  font-size:13px;
+  white-space:nowrap;
+}
+.switch-btn.active{
+  border-color: rgba(255,212,0,.55);
+  background: rgba(255,212,0,.16);
+  color: var(--accent);
+}
+
 /* responsive top menu */
 .menu-btn{
   display:none;
@@ -79,6 +107,7 @@ body.site-mirrored #appRoot{
   padding:10px 12px;
   font-weight:900;
   cursor:pointer;
+  white-space:nowrap;
 }
 .menu-btn:hover{filter:brightness(1.10)}
 
@@ -118,7 +147,7 @@ body.site-mirrored #appRoot{
 
 @media (max-width: 860px){
   .top-actions{ display:none; }
-  .menu-btn{ display:inline-flex; align-items:center; gap:8px; }
+  .menu-btn{ display:inline-flex; }
 }
 
 /* layout */
@@ -128,7 +157,7 @@ body.site-mirrored #appRoot{
   display:flex;
   gap:0;
   padding:14px;
-  overflow:hidden; /* evita scroll orizzontale su finestre piccole */
+  overflow:hidden;
 }
 
 /* panels */
@@ -449,7 +478,7 @@ body.editor-collapsed .panel.editor .panel-head{ justify-content:center; }
   font-size:14px;
 }
 
-/* MOBILE/TABLET: stack + height reale per viewer (fix schermo nero) */
+/* MOBILE/TABLET: one view at a time (solves tiny script area) */
 @media (max-width: 1024px){
   body{ overflow:auto; }
   #appRoot{ height:auto; min-height:100vh; }
@@ -460,6 +489,7 @@ body.editor-collapsed .panel.editor .panel-head{ justify-content:center; }
     padding:10px;
     overflow:visible;
   }
+
   .splitter{ display:none; }
   .panel.prompter{ margin-left:0; }
   .panel.editor, .panel.prompter{
@@ -467,9 +497,20 @@ body.editor-collapsed .panel.editor .panel-head{ justify-content:center; }
     max-width:none;
   }
 
+  /* show switch on mobile/tablet */
+  .view-switch{ display:flex; }
+
+  /* default: show editor, hide prompter */
+  body.mobile-view-edit #editorPanel{ display:flex; }
+  body.mobile-view-edit #prompterPanel{ display:none; }
+
+  body.mobile-view-prompt #editorPanel{ display:none; }
+  body.mobile-view-prompt #prompterPanel{ display:flex; }
+
+  /* ensure prompter has real height */
   .viewer-wrap{
-    height:60vh;        /* cruciale */
-    min-height:320px;   /* cruciale */
+    height:60vh;
+    min-height:320px;
   }
   .viewer{ height:100%; }
 
@@ -477,4 +518,3 @@ body.editor-collapsed .panel.editor .panel-head{ justify-content:center; }
   .control-group input[type="range"]{ width:100px; }
   .content{ font-size:32px; padding:20px 16px 120px; }
 }
-
