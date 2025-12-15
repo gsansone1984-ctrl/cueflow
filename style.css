@@ -551,3 +551,44 @@ body.editor-collapsed .panel.editor .panel-head{ justify-content:center; }
   .control-group input[type="range"]{ width:100px; }
   .content{ font-size:32px; padding:20px 16px 120px; }
 }
+
+/* MOBILE/TABLET: Script full width (one view at a time) */
+@media (max-width: 1024px){
+  body{ overflow:auto; }
+  #appRoot{ height:auto; min-height:100vh; }
+
+  .layout{
+    flex-direction:column;
+    gap:12px;
+    padding:10px;
+    overflow:visible;
+  }
+
+  .panel.prompter{ margin-left:0; }
+  .panel.editor, .panel.prompter{
+    width:100%;
+    max-width:none;
+  }
+
+  .view-switch{ display:flex; }
+
+  /* default classes control visibility */
+  body.mobile-view-edit #editorPanel{ display:flex !important; }
+  body.mobile-view-edit #prompterPanel{ display:none !important; }
+
+  body.mobile-view-prompt #editorPanel{ display:none !important; }
+  body.mobile-view-prompt #prompterPanel{ display:flex !important; }
+
+  /* make editor comfortable */
+  #editorPanel .rte{
+    min-height: 60vh;
+    font-size: 16px;
+  }
+
+  /* prompter height */
+  .viewer-wrap{
+    height: 65vh;
+    min-height: 320px;
+  }
+}
+
