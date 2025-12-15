@@ -3,8 +3,12 @@
   --text:#f2f2f2;
   --muted:#bdbdbd;
   --border:rgba(255,255,255,.12);
+
   --primary:#4f7cff;
+  --primary2:#7a5cff;
   --danger:#ff4f6d;
+
+  --chip: rgba(255,255,255,.06);
 }
 
 *{box-sizing:border-box}
@@ -16,6 +20,7 @@ body{
   color:var(--text);
 }
 
+/* Topbar */
 .topbar{
   position:sticky; top:0;
   display:flex; align-items:center; justify-content:space-between;
@@ -25,19 +30,35 @@ body{
   z-index:10;
 }
 
-.brand{display:flex; gap:10px; align-items:center}
-.logo{
-  width:40px;height:40px;border-radius:12px;
-  display:grid;place-items:center;
-  background:rgba(79,124,255,.18);
-  border:1px solid rgba(79,124,255,.35);
-  font-weight:700;
-}
-.brand-name{font-weight:700}
+.brand{display:flex; gap:12px; align-items:center}
+.brand-logo{width:40px;height:40px}
+.brand-text{display:flex;flex-direction:column}
+.brand-name{font-weight:800; letter-spacing:.2px}
 .brand-sub{font-size:12px;color:var(--muted)}
 
-.top-actions{display:flex; gap:8px; align-items:center}
+.top-actions{display:flex; gap:10px; align-items:center}
 
+/* More attractive top buttons */
+.action-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  color: var(--text);
+  cursor:pointer;
+  font-weight:700;
+}
+.action-btn:hover{filter:brightness(1.10)}
+.action-btn .ico{opacity:.9}
+.action-btn.primary{
+  border-color: rgba(79,124,255,.55);
+  background: linear-gradient(90deg, rgba(79,124,255,.25), rgba(122,92,255,.22));
+}
+
+/* Layout */
 .layout{
   display:grid;
   grid-template-columns: 1fr 1.2fr;
@@ -60,6 +81,7 @@ body{
   letter-spacing:.2px;
 }
 
+/* Tabs */
 .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
 .tab{
   padding:8px 10px;
@@ -75,6 +97,7 @@ body{
   background:rgba(79,124,255,.20);
 }
 
+/* Buttons */
 .btn{
   padding:10px 12px;
   border-radius:12px;
@@ -94,12 +117,20 @@ body{
   border-radius:10px;
   font-size:12px;
 }
+.btn.chip{
+  background: var(--chip);
+  border-color: rgba(255,255,255,.14);
+}
 
 .row{display:flex; gap:10px; margin-top:10px}
 .hint{margin-top:10px; font-size:12px; color:var(--muted)}
 
-.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color:var(--muted)}
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color:var(--muted)
+}
 
+/* Controls */
 .controls{
   display:flex;
   flex-wrap:wrap;
@@ -119,7 +150,7 @@ body{
 .control-group label{font-size:12px; color:var(--muted)}
 .control-group input[type="range"]{width:140px}
 
-/* Align select leggibile */
+/* Align select readable */
 .control-group select{
   background:#000;
   color:var(--text);
@@ -133,11 +164,11 @@ body{
   color:#000;
 }
 
-/* Rich Text Editor */
+/* Rich Text Editor toolbar */
 .formatbar{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  gap:10px;
   align-items:center;
   padding:8px;
   border:1px solid var(--border);
@@ -149,20 +180,19 @@ body{
   width:1px;
   height:24px;
   background:rgba(255,255,255,.12);
-  margin:0 2px;
 }
-.kbd{font-weight:800; letter-spacing:.5px}
+.kbd{font-weight:900; letter-spacing:.4px}
+.group{display:flex; gap:8px; align-items:center}
+.label{font-size:12px; color:var(--muted)}
 
-/* Highlight button labels */
-.btn.hl.yellow{border-color: rgba(255,255,255,.12);}
-.btn.hl.green{border-color: rgba(255,255,255,.12);}
-.btn.hl.blue{border-color: rgba(255,255,255,.12);}
-.btn.hl.pink{border-color: rgba(255,255,255,.12);}
+/* Highlight chips (only blue + pink kept) */
+.btn.hl.blue{ }
+.btn.hl.pink{ }
 
+/* Editor */
 .rte{
   width:100%;
   min-height: 58vh;
-  resize: vertical;
   padding:12px;
   border-radius:14px;
   border:1px solid var(--border);
@@ -179,7 +209,7 @@ body{
   color:rgba(255,255,255,.35);
 }
 
-/* Teleprompter window nera */
+/* Teleprompter */
 .viewer-wrap{
   border:1px solid var(--border);
   border-radius:16px;
@@ -187,6 +217,12 @@ body{
   height: calc(100vh - 190px);
   background:#000;
 }
+
+/* MIRROR FIX: mirror the wrapper, not the text layer */
+.viewer-wrap.mirrored{
+  transform: scaleX(-1);
+}
+
 .viewer{
   height:100%;
   overflow:hidden;
@@ -194,7 +230,12 @@ body{
   background:#000;
 }
 
-/* Rich formatted output */
+.scroll-layer{
+  position:absolute;
+  inset:0;
+  will-change: transform;
+}
+
 .content{
   position:absolute;
   top:0;
@@ -206,14 +247,11 @@ body{
   text-align:center;
   white-space:pre-wrap;
 }
+
+/* Rich formatted output */
 .content b, .content strong{font-weight:800}
 .content i, .content em{font-style:italic}
 .content u{text-decoration:underline}
-
-.mirrored .content,
-.mirroredPresent .present-content{
-  transform: scaleX(-1);
-}
 
 /* Present overlay */
 .present{
@@ -225,6 +263,11 @@ body{
   flex-direction:column;
 }
 .present.hidden{display:none}
+
+/* mirror present view wrapper */
+.present.mirroredPresent .present-view{
+  transform: scaleX(-1);
+}
 
 .present-controls{
   display:flex;
@@ -241,6 +284,12 @@ body{
   overflow:hidden;
   position:relative;
   background:#000;
+}
+
+.present-scroll-layer{
+  position:absolute;
+  inset:0;
+  will-change: transform;
 }
 
 .present-content{
