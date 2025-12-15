@@ -17,6 +17,12 @@
         </div>
       </div>
 
+      <!-- MOBILE VIEW SWITCH -->
+      <div class="view-switch" id="viewSwitch" aria-label="View switch">
+        <button id="btnViewEdit" class="switch-btn active" type="button">Edit Script</button>
+        <button id="btnViewPrompt" class="switch-btn" type="button">Teleprompter</button>
+      </div>
+
       <!-- Desktop actions -->
       <div class="top-actions" id="topActions">
         <button id="btnMirror" class="action-btn" title="Mirror prompt (M)">
@@ -93,7 +99,6 @@
         </div>
       </section>
 
-      <!-- Splitter (drag resize) -->
       <div id="splitter" class="splitter" title="Drag to resize"></div>
 
       <section class="panel prompter" id="prompterPanel">
@@ -135,13 +140,11 @@
       </section>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
       <div class="footer-left">© Sansone 2026</div>
       <a href="#" id="aboutLink" class="footer-link">About</a>
     </footer>
 
-    <!-- About modal -->
     <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
       <div class="modal-card">
         <div class="modal-head">
@@ -154,7 +157,6 @@
       </div>
     </div>
 
-    <!-- Present overlay -->
     <div id="presentOverlay" class="present hidden">
       <div class="present-controls">
         <button id="pPlay" class="btn primary">Play</button>
