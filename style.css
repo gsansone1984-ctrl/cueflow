@@ -616,3 +616,88 @@ body.editor-collapsed .panel.editor .panel-head{ justify-content:center; }
     font-size: 16px !important;
   }
 }
+
+/* ===== MOBILE STABILIZER (iOS): tidy layout + footer always after content ===== */
+@media (max-width: 1024px){
+
+  /* iOS safe scrolling */
+  html, body{
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* IMPORTANT: do NOT lock the app to 100dvh on mobile */
+  #appRoot{
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+
+  /* vertical layout */
+  .layout{
+    flex-direction: column !important;
+    padding: 10px !important;
+    gap: 12px !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
+
+  /* panels full width */
+  .panel{
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+  }
+
+  /* hide desktop splitter on mobile */
+  .splitter{ display:none !important; }
+  .panel.prompter{ margin-left: 0 !important; }
+
+  /* one-view-at-a-time (your switch controls this) */
+  body.mobile-view-edit #editorPanel{ display:flex !important; }
+  body.mobile-view-edit #prompterPanel{ display:none !important; }
+  body.mobile-view-prompt #editorPanel{ display:none !important; }
+  body.mobile-view-prompt #prompterPanel{ display:flex !important; }
+
+  /* TABS: clean 2-column wrap without breaking topbar */
+  .tabs{
+    display:flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+  .tab{
+    flex: 1 1 calc(50% - 10px) !important;
+    text-align: center !important;
+    min-width: 130px !important;
+  }
+
+  /* TOOLBAR: wrap properly, no forced column that stretches everything */
+  .formatbar{
+    display:flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+  .formatbar .sep{
+    display:none !important; /* on mobile separators cause ugly breaks */
+  }
+  .formatbar .group{
+    display:flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* editor writing area bigger */
+  #editorPanel .rte{
+    min-height: 58vh !important;
+    font-size: 16px !important;
+  }
+
+  /* footer ALWAYS after content, never "in the middle" */
+  .footer{
+    position: static !important;
+    width: 100% !important;
+    margin-top: 12px !important;
+  }
+}
