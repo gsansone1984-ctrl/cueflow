@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CueFlow — Teleprompter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CF</div>
+      <div>
+        <div class="brand-name">CueFlow</div>
+        <div class="brand-sub">Teleprompter for creators</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button id="btnFullscreen" class="btn secondary" title="Fullscreen (F)">Fullscreen</button>
+      <button id="btnMirror" class="btn secondary" title="Mirror (M)">Mirror</button>
+      <button id="btnPresent" class="btn primary" title="Present mode">Present</button>
+    </div>
+  </header>
+
+  <main class="layout" id="layout">
+    <section class="panel editor">
+      <div class="panel-title">Script</div>
+
+      <div class="tabs" id="slots"></div>
+
+      <textarea id="scriptInput" placeholder="Paste your script here..."></textarea>
+
+      <div class="row">
+        <button id="btnSave" class="btn">Save</button>
+        <button id="btnClear" class="btn danger">Clear</button>
+      </div>
+
+      <div class="hint">
+        Shortcuts: Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · R reset
+      </div>
+    </section>
+
+    <section class="panel prompter">
+      <div class="panel-title">Teleprompter</div>
+
+      <div class="controls">
+        <button id="btnPlay" class="btn primary">Play</button>
+        <button id="btnReset" class="btn secondary">Reset</button>
+
+        <div class="control-group">
+          <label>Speed</label>
+          <input id="speed" type="range" min="5" max="200" value="60" />
+          <span id="speedVal" class="mono">60</span>
+        </div>
+
+        <div class="control-group">
+          <label>Text</label>
+          <input id="fontSize" type="range" min="18" max="72" value="40" />
+          <span id="fontVal" class="mono">40</span>
+        </div>
+
+        <div class="control-group">
+          <label>Align</label>
+          <select id="align">
+            <option value="left">Left</option>
+            <option value="center" selected>Center</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="viewer-wrap" id="viewerWrap">
+        <div class="viewer" id="viewer">
+          <div id="content" class="content"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Present overlay -->
+  <div id="presentOverlay" class="present hidden">
+    <div class="present-controls">
+      <button id="pPlay" class="btn primary">Play</button>
+      <button id="pReset" class="btn secondary">Reset</button>
+      <button id="pExit" class="btn danger">Exit</button>
+
+      <div class="mini">
+        <span class="tag">Speed</span>
+        <input id="pSpeed" type="range" min="5" max="200" value="60" />
+        <span id="pSpeedVal" class="mono">60</span>
+      </div>
+
+      <div class="mini">
+        <span class="tag">Text</span>
+        <input id="pFont" type="range" min="18" max="96" value="56" />
+        <span id="pFontVal" class="mono">56</span>
+      </div>
+
+      <button id="pMirror" class="btn secondary">Mirror</button>
+    </div>
+
+    <div class="present-view" id="presentView">
+      <div id="presentContent" class="present-content"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
