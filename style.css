@@ -430,3 +430,117 @@ body.editor-collapsed .panel.editor .panel-head{
   }
 }
 
+/* ---------- Top menu responsive ---------- */
+.menu-btn{
+  display:none;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  color: var(--accent);
+  border-radius:12px;
+  padding:10px 12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.menu-btn:hover{filter:brightness(1.10)}
+
+.mobile-menu{
+  position:absolute;
+  top:64px;
+  right:14px;
+  width:min(260px, calc(100vw - 28px));
+  border:1px solid rgba(255,255,255,.16);
+  background:#000;
+  border-radius:14px;
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:50;
+}
+.mobile-menu.hidden{display:none}
+
+.menu-item{
+  width:100%;
+  text-align:left;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: var(--text);
+  cursor:pointer;
+  font-weight:800;
+}
+.menu-item.primary{
+  border-color: rgba(255,212,0,.55);
+  background: linear-gradient(90deg, rgba(255,212,0,.18), rgba(255,184,0,.14));
+  color: var(--accent);
+}
+.menu-item:hover{filter:brightness(1.10)}
+
+/* Tablet/phone: hide horizontal buttons, show Menu */
+@media (max-width: 860px){
+  .topbar{ position:relative; }
+  .top-actions{ display:none; }
+  .menu-btn{ display:inline-flex; align-items:center; gap:8px; }
+}
+
+/* ---------- Footer ---------- */
+.footer{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;
+  border-top:1px solid rgba(255,255,255,.12);
+  background:#000;
+  color: rgba(255,255,255,.75);
+  font-size:12px;
+}
+.footer-link{
+  color: var(--accent);
+  text-decoration:none;
+  font-weight:800;
+}
+.footer-link:hover{ text-decoration:underline; }
+
+/* ---------- About modal ---------- */
+.modal{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.65);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  padding:16px;
+}
+.modal.hidden{display:none}
+
+.modal-card{
+  width:min(720px, 100%);
+  border:1px solid rgba(255,255,255,.14);
+  background:#000;
+  border-radius:16px;
+  padding:12px;
+}
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(255,255,255,.10);
+}
+.modal-title{
+  color: var(--accent);
+  font-weight:900;
+  letter-spacing:.2px;
+}
+.modal-body{
+  padding-top:10px;
+  color: rgba(255,255,255,.88);
+  line-height:1.5;
+  font-size:14px;
+}
+
+
