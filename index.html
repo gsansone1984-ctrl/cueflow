@@ -29,7 +29,25 @@
 
       <div class="tabs" id="slots"></div>
 
-      <textarea id="scriptInput" placeholder="Paste your script here..."></textarea>
+      <!-- Formatting toolbar -->
+      <div class="formatbar">
+        <button class="btn tiny" id="fmtBold" title="Bold"><span class="kbd">B</span></button>
+        <button class="btn tiny" id="fmtItalic" title="Italic"><span class="kbd">I</span></button>
+        <button class="btn tiny" id="fmtUnderline" title="Underline"><span class="kbd">U</span></button>
+
+        <div class="sep"></div>
+
+        <button class="btn tiny hl yellow" id="hlYellow" title="Highlight Yellow">Yellow</button>
+        <button class="btn tiny hl green" id="hlGreen" title="Highlight Green">Green</button>
+        <button class="btn tiny hl blue" id="hlBlue" title="Highlight Blue">Blue</button>
+        <button class="btn tiny hl pink" id="hlPink" title="Highlight Pink">Pink</button>
+
+        <button class="btn tiny secondary" id="hlClear" title="Remove highlight">Clear</button>
+      </div>
+
+      <!-- Rich text editor -->
+      <div id="scriptInput" class="rte" contenteditable="true" spellcheck="false"
+           aria-label="Script editor"></div>
 
       <div class="row">
         <button id="btnSave" class="btn">Save</button>
@@ -37,7 +55,8 @@
       </div>
 
       <div class="hint">
-        Shortcuts: Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · R reset
+        Tip: select text then use B / I / U or highlight buttons.
+        Shortcuts (viewer): Space play/pause · ↑↓ speed · +/- text · F fullscreen · M mirror · R reset
       </div>
     </section>
 
