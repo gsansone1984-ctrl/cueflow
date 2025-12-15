@@ -31,8 +31,8 @@ const align = $("align");
 
 const editorPanel = $("editorPanel");
 const splitter = $("splitter");
-const viewerWrap = $("viewerWrap");
 
+const viewerWrap = $("viewerWrap");
 const scrollLayer = $("scrollLayer");
 const content = $("content");
 
@@ -88,6 +88,12 @@ let lastTs = null;
 
 let isDragging = false;
 
+/* editor width state (for resize clamp) */
+let editorWidthPx = 420;
+
+/* ------------------ helpers ------------------ */
+function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+
 /* ------------------ tabs ------------------ */
 function renderTabs(){
   slotsEl.innerHTML = "";
@@ -127,13 +133,25 @@ function syncTeleprompterHTML(){
   });
 }
 
+/* ------------------ viewer height safe (fix black screen on mobile/tablet) ------------------ */
+function getMainViewerHeight(){
+  const h = viewerWrap?.clientHeight || 0;
+  if(h > 50) return h;
+  return Math.floor(window.innerHeight * 0.60);
+}
+function getPresentViewerHeight(){
+  const h = presentView?.clientHeight || 0;
+  if(h > 50) return h;
+  return Math.floor(window.innerHeight * 0.75);
+}
+
 /* ------------------ start-from-bottom offsets ------------------ */
 function startOffsetMain(){
-  const h = viewerWrap.clientHeight || 0;
+  const h = getMainViewerHeight();
   return Math.max(0, h - 70);
 }
 function startOffsetPresent(){
-  const h = presentView.clientHeight || 0;
+  const h = getPresentViewerHeight();
   return Math.max(0, h - 140);
 }
 
@@ -146,14 +164,14 @@ function resetScroll(){
 }
 
 function clampScroll(){
-  const wrapH = viewerWrap.clientHeight;
+  const wrapH = getMainViewerHeight();
   const s0 = startOffsetMain();
 
   const total = content.scrollHeight + s0;
   const maxY = Math.max(0, total - wrapH + 40);
   y = Math.min(Math.max(y, 0), maxY);
 
-  const pWrapH = presentView.clientHeight;
+  const pWrapH = getPresentViewerHeight();
   const ps0 = startOffsetPresent();
   const pTotal = presentContent.scrollHeight + ps0;
   const pMaxY = Math.max(0, pTotal - pWrapH + 80);
@@ -297,7 +315,7 @@ function closePresent(){
   }
 }
 
-/* ------------------ collapse editor (no persistence) ------------------ */
+/* ------------------ collapse editor ------------------ */
 function setEditorCollapsed(collapsed){
   document.body.classList.toggle("editor-collapsed", collapsed);
   collapseIcon.textContent = collapsed ? "▶" : "◀";
@@ -308,11 +326,22 @@ function toggleEditorCollapsed(){
   setEditorCollapsed(!document.body.classList.contains("editor-collapsed"));
 }
 
-/* ------------------ drag resize (no persistence) ------------------ */
-function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+/* ------------------ drag resize + clamp on resize ------------------ */
+function getMaxEditorWidth(){
+  const layout = document.getElementById("layout");
+  if(!layout) return 720;
+  const r = layout.getBoundingClientRect();
+  const maxW = Math.min(720, r.width - 260); // garantisce spazio al prompter
+  return Math.max(280, maxW);
+}
 
 function setEditorWidth(px){
-  editorPanel.style.flexBasis = `${px}px`;
+  const minW = 280;
+  const maxW = getMaxEditorWidth();
+
+  editorWidthPx = clamp(px, minW, maxW);
+  editorPanel.style.flexBasis = `${editorWidthPx}px`;
+
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
 
@@ -327,10 +356,7 @@ function onDragMove(e){
   if(!isDragging) return;
   const layoutRect = document.getElementById("layout").getBoundingClientRect();
   const x = e.clientX - layoutRect.left;
-
-  const minW = 280;
-  const maxW = Math.min(720, layoutRect.width - 260);
-  setEditorWidth(clamp(x, minW, maxW));
+  setEditorWidth(x);
 }
 
 function stopDrag(){
@@ -374,6 +400,7 @@ function clearAll(){
   syncTeleprompterHTML();
   resetScroll();
   closeMobileMenu();
+  closeAbout();
 }
 
 /* ------------------ bindings ------------------ */
@@ -426,18 +453,18 @@ btnSiteMirror.onclick = () => { toggleSiteMirror(); closeMobileMenu(); };
 btnFullscreen.onclick = () => { toggleFullscreen(); closeMobileMenu(); };
 btnPresent.onclick = openPresent;
 
-/* mobile menu buttons */
+/* mobile menu */
 btnMenu.onclick = toggleMobileMenu;
 mBtnMirror.onclick = () => { toggleMirror(); closeMobileMenu(); };
 mBtnSiteMirror.onclick = () => { toggleSiteMirror(); closeMobileMenu(); };
 mBtnFullscreen.onclick = () => { toggleFullscreen(); closeMobileMenu(); };
 mBtnPresent.onclick = openPresent;
 
-/* close menu when clicking outside */
+/* close menu on outside click */
 document.addEventListener("click", (e) => {
   if(mobileMenu.classList.contains("hidden")) return;
-  const clickInside = mobileMenu.contains(e.target) || btnMenu.contains(e.target);
-  if(!clickInside) closeMobileMenu();
+  const inside = mobileMenu.contains(e.target) || btnMenu.contains(e.target);
+  if(!inside) closeMobileMenu();
 });
 
 /* About */
@@ -449,7 +476,7 @@ aboutModal.addEventListener("click", (e) => {
 
 btnCollapseEditor.onclick = toggleEditorCollapsed;
 
-/* formatting buttons */
+/* formatting */
 fmtBold.onclick = () => exec("bold");
 fmtItalic.onclick = () => exec("italic");
 fmtUnderline.onclick = () => exec("underline");
@@ -467,7 +494,7 @@ splitter?.addEventListener("mousedown", startDrag);
 window.addEventListener("mousemove", onDragMove);
 window.addEventListener("mouseup", stopDrag);
 
-/* keyboard shortcuts */
+/* keyboard */
 document.addEventListener("keydown", (e) => {
   const inEditor = (e.target && e.target.id) === "scriptInput";
 
@@ -498,7 +525,11 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "-"){ fontSize.value = String(Math.max(18, Number(fontSize.value)-2)); fontSize.dispatchEvent(new Event("input")); }
 });
 
+/* resize: clamp editor width + recalcoli scroll (fix mobile black) */
 window.addEventListener("resize", () => {
+  if(!document.body.classList.contains("editor-collapsed")){
+    setEditorWidth(editorWidthPx);
+  }
   requestAnimationFrame(() => {
     clampScroll();
     applyScroll();
@@ -514,12 +545,12 @@ function init(){
 
   setFont(Number(fontSize.value));
   setAlign(align.value);
+
   setEditorCollapsed(false);
   setEditorWidth(420);
+
   closeMobileMenu();
   closeAbout();
 }
 
 init();
-
-
