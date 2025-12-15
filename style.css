@@ -356,3 +356,77 @@ body.editor-collapsed .panel.editor .panel-head{
   .panel.prompter{margin-left:0;}
   .panel.editor{max-width:none; flex:0 0 auto;}
 }
+
+/* =========================
+   MOBILE & TABLET FIX
+   ========================= */
+@media (max-width: 1024px){
+
+  /* riattiva comportamento web normale */
+  body{
+    overflow:auto;
+  }
+
+  #appRoot{
+    height:auto;
+    min-height:100vh;
+  }
+
+  /* layout a colonna */
+  .layout{
+    flex-direction:column;
+    gap:12px;
+    padding:10px;
+  }
+
+  /* nascondi splitter */
+  .splitter{
+    display:none !important;
+  }
+
+  /* pannelli full width */
+  .panel{
+    width:100%;
+    max-width:none;
+  }
+
+  .panel.editor,
+  .panel.prompter{
+    flex:0 0 auto;
+    max-width:none;
+    margin:0;
+  }
+
+  /* Teleprompter più alto */
+  .viewer-wrap{
+    min-height:60vh;
+  }
+
+  /* controlli più leggibili */
+  .controls{
+    gap:8px;
+  }
+
+  .control-group input[type="range"]{
+    width:100px;
+  }
+
+  /* toolbar che va a capo bene */
+  .formatbar{
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  /* pulsanti top più compatti */
+  .action-btn{
+    padding:8px 10px;
+    font-size:13px;
+  }
+
+  /* testo prompter leggermente più piccolo di default */
+  .content{
+    font-size:32px;
+    padding:20px 16px 120px;
+  }
+}
+
