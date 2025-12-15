@@ -1,12 +1,8 @@
 :root{
-  --bg:#000000;
-  --panel:#000000;
-  --panel2:#000000;
-
+  --bg:#000;
   --text:#f2f2f2;
   --muted:#bdbdbd;
   --border:rgba(255,255,255,.12);
-
   --primary:#4f7cff;
   --danger:#ff4f6d;
 }
@@ -79,22 +75,6 @@ body{
   background:rgba(79,124,255,.20);
 }
 
-textarea{
-  width:100%;
-  min-height: 58vh;
-  resize: vertical;
-  padding:12px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#000;
-  color:var(--text);
-  outline:none;
-  line-height:1.5;
-  font-size:14px;
-}
-
-.row{display:flex; gap:10px; margin-top:10px}
-
 .btn{
   padding:10px 12px;
   border-radius:12px;
@@ -105,19 +85,20 @@ textarea{
   font-weight:600;
 }
 .btn:hover{filter:brightness(1.08)}
-.btn.primary{
-  background:rgba(79,124,255,.22);
-  border-color: rgba(79,124,255,.45);
-}
-.btn.secondary{
-  background:rgba(255,255,255,.05);
-}
-.btn.danger{
-  background:rgba(255,79,109,.18);
-  border-color: rgba(255,79,109,.4);
+.btn.primary{background:rgba(79,124,255,.22); border-color: rgba(79,124,255,.45);}
+.btn.secondary{background:rgba(255,255,255,.05);}
+.btn.danger{background:rgba(255,79,109,.18); border-color: rgba(255,79,109,.4);}
+
+.btn.tiny{
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:12px;
 }
 
+.row{display:flex; gap:10px; margin-top:10px}
 .hint{margin-top:10px; font-size:12px; color:var(--muted)}
+
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color:var(--muted)}
 
 .controls{
   display:flex;
@@ -126,7 +107,6 @@ textarea{
   align-items:center;
   margin-bottom:10px;
 }
-
 .control-group{
   display:flex;
   gap:8px;
@@ -139,7 +119,7 @@ textarea{
 .control-group label{font-size:12px; color:var(--muted)}
 .control-group input[type="range"]{width:140px}
 
-/* ALIGN SELECT: leggibile */
+/* Align select leggibile */
 .control-group select{
   background:#000;
   color:var(--text);
@@ -148,19 +128,58 @@ textarea{
   padding:6px 8px;
   outline:none;
 }
-
-/* Dropdown options: leggibili */
 .control-group select option{
-  background:#ffffff;
-  color:#000000;
+  background:#fff;
+  color:#000;
 }
 
-.mono{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  color:var(--muted)
+/* Rich Text Editor */
+.formatbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  padding:8px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+  margin-bottom:10px;
+}
+.sep{
+  width:1px;
+  height:24px;
+  background:rgba(255,255,255,.12);
+  margin:0 2px;
+}
+.kbd{font-weight:800; letter-spacing:.5px}
+
+/* Highlight button labels */
+.btn.hl.yellow{border-color: rgba(255,255,255,.12);}
+.btn.hl.green{border-color: rgba(255,255,255,.12);}
+.btn.hl.blue{border-color: rgba(255,255,255,.12);}
+.btn.hl.pink{border-color: rgba(255,255,255,.12);}
+
+.rte{
+  width:100%;
+  min-height: 58vh;
+  resize: vertical;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#000;
+  color:var(--text);
+  outline:none;
+  line-height:1.5;
+  font-size:14px;
+  overflow:auto;
+  white-space:pre-wrap;
+}
+.rte:empty:before{
+  content:"Paste your script here...";
+  color:rgba(255,255,255,.35);
 }
 
-/* Teleprompter window tutta nera */
+/* Teleprompter window nera */
 .viewer-wrap{
   border:1px solid var(--border);
   border-radius:16px;
@@ -175,6 +194,7 @@ textarea{
   background:#000;
 }
 
+/* Rich formatted output */
 .content{
   position:absolute;
   top:0;
@@ -186,12 +206,16 @@ textarea{
   text-align:center;
   white-space:pre-wrap;
 }
+.content b, .content strong{font-weight:800}
+.content i, .content em{font-style:italic}
+.content u{text-decoration:underline}
 
 .mirrored .content,
 .mirroredPresent .present-content{
   transform: scaleX(-1);
 }
 
+/* Present overlay */
 .present{
   position:fixed;
   inset:0;
@@ -200,7 +224,6 @@ textarea{
   display:flex;
   flex-direction:column;
 }
-
 .present.hidden{display:none}
 
 .present-controls{
@@ -231,6 +254,9 @@ textarea{
   white-space:pre-wrap;
   color:#fff;
 }
+.present-content b, .present-content strong{font-weight:800}
+.present-content i, .present-content em{font-style:italic}
+.present-content u{text-decoration:underline}
 
 .mini{
   display:flex; align-items:center; gap:8px;
