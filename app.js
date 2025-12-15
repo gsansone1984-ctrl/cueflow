@@ -1,10 +1,10 @@
 const SLOTS = 5;
-const LS_KEY = "cueflow_slots_v2_html";
+const LS_KEY = "cueflow_slots_v3_html";
 
 const $ = (id) => document.getElementById(id);
 
 const slotsEl = $("slots");
-const scriptInput = $("scriptInput"); // contenteditable
+const scriptInput = $("scriptInput");
 const btnSave = $("btnSave");
 const btnClear = $("btnClear");
 
@@ -12,8 +12,10 @@ const fmtBold = $("fmtBold");
 const fmtItalic = $("fmtItalic");
 const fmtUnderline = $("fmtUnderline");
 
-const hlYellow = $("hlYellow");
-const hlGreen = $("hlGreen");
+const tcYellow = $("tcYellow");
+const tcGreen = $("tcGreen");
+const tcReset = $("tcReset");
+
 const hlBlue = $("hlBlue");
 const hlPink = $("hlPink");
 const hlClear = $("hlClear");
@@ -28,6 +30,7 @@ const align = $("align");
 
 const viewerWrap = $("viewerWrap");
 const viewer = $("viewer");
+const scrollLayer = $("scrollLayer");
 const content = $("content");
 
 const btnFullscreen = $("btnFullscreen");
@@ -36,6 +39,7 @@ const btnPresent = $("btnPresent");
 
 const presentOverlay = $("presentOverlay");
 const presentView = $("presentView");
+const presentScrollLayer = $("presentScrollLayer");
 const presentContent = $("presentContent");
 const pPlay = $("pPlay");
 const pReset = $("pReset");
@@ -52,14 +56,12 @@ let activeSlot = 1;
 let isPlaying = false;
 let rafId = null;
 
-// Scroll state
+// scroll offsets
 let y = 0;
-let lastTs = null;
 let presentY = 0;
+let lastTs = null;
 
-/* ---------------------------
-   Storage
---------------------------- */
+/* ---------- storage ---------- */
 function initSlots(){
   const base = {};
   for(let i=1;i<=SLOTS;i++) base[i] = "";
@@ -82,9 +84,7 @@ function saveSlots(){
   localStorage.setItem(LS_KEY, JSON.stringify(slots));
 }
 
-/* ---------------------------
-   Tabs
---------------------------- */
+/* ---------- tabs ---------- */
 function renderTabs(){
   slotsEl.innerHTML = "";
   for(let i=1;i<=SLOTS;i++){
@@ -112,23 +112,18 @@ function loadActiveHTML(){
   scriptInput.innerHTML = slots[activeSlot] || "";
 }
 
-/* ---------------------------
-   Teleprompter sync (HTML)
---------------------------- */
+/* ---------- sync ---------- */
 function syncTeleprompterHTML(){
   const html = scriptInput.innerHTML || "";
   content.innerHTML = html;
   presentContent.innerHTML = html;
-
   requestAnimationFrame(() => {
     clampScroll();
     applyScroll();
   });
 }
 
-/* ---------------------------
-   Scrolling
---------------------------- */
+/* ---------- scrolling ---------- */
 function resetScroll(){
   y = 0;
   presentY = 0;
@@ -152,13 +147,13 @@ function clampScroll(){
 }
 
 function applyScroll(){
-  content.style.transform = `translateY(${-y}px)`;
-  presentContent.style.transform = `translateY(${-presentY}px)`;
+  // NEW: apply translate to scroll layers, not the text nodes
+  scrollLayer.style.transform = `translateY(${-y}px)`;
+  presentScrollLayer.style.transform = `translateY(${-presentY}px)`;
 }
 
 function speedPxPerSec(){
-  const v = Number(speed.value);
-  return v * 6;
+  return Number(speed.value) * 6;
 }
 
 function tick(ts){
@@ -195,41 +190,36 @@ function togglePlay(){
   isPlaying ? pause() : play();
 }
 
-/* ---------------------------
-   Formatting helpers
-   Uses execCommand (still widely supported for basic rich text)
---------------------------- */
-function focusEditor(){
-  scriptInput.focus();
-}
+/* ---------- formatting helpers ---------- */
+function focusEditor(){ scriptInput.focus(); }
 
 function exec(cmd, value=null){
   focusEditor();
   document.execCommand(cmd, false, value);
-  // Save + sync after formatting
+  persistActiveHTML();
+  syncTeleprompterHTML();
+}
+
+function setTextColor(color){
+  focusEditor();
+  document.execCommand("foreColor", false, color);
   persistActiveHTML();
   syncTeleprompterHTML();
 }
 
 function applyHighlight(color){
-  // Use BACKCOLOR for most browsers; fallback to HILITECOLOR
   focusEditor();
   const ok = document.execCommand("backColor", false, color);
-  if(!ok){
-    document.execCommand("hiliteColor", false, color);
-  }
+  if(!ok) document.execCommand("hiliteColor", false, color);
   persistActiveHTML();
   syncTeleprompterHTML();
 }
 
 function clearHighlight(){
-  // Easiest cross-browser approach: set transparent background
   applyHighlight("transparent");
 }
 
-/* ---------------------------
-   View settings
---------------------------- */
+/* ---------- view settings ---------- */
 function setFont(px){
   content.style.fontSize = `${px}px`;
   presentContent.style.fontSize = `${Math.max(px, 40) + 16}px`;
@@ -241,6 +231,7 @@ function setAlign(a){
 }
 
 function toggleMirror(){
+  // NEW: mirror via wrapper classes only
   viewerWrap.classList.toggle("mirrored");
   presentOverlay.classList.toggle("mirroredPresent");
 }
@@ -257,11 +248,13 @@ function toggleFullscreen(){
 function openPresent(){
   persistActiveHTML();
   syncTeleprompterHTML();
+
   presentOverlay.classList.remove("hidden");
   presentOverlay.requestFullscreen?.().catch(()=>{});
 
   pSpeed.value = speed.value;
   pSpeedVal.textContent = speed.value;
+
   pFont.value = Math.max(Number(fontSize.value), 40) + 16;
   pFontVal.textContent = pFont.value;
 
@@ -278,10 +271,8 @@ function closePresent(){
   }
 }
 
-/* ---------------------------
-   Bindings
---------------------------- */
-btnSave.onclick = () => { persistActiveHTML(); };
+/* ---------- bindings ---------- */
+btnSave.onclick = () => persistActiveHTML();
 btnClear.onclick = () => {
   scriptInput.innerHTML = "";
   persistActiveHTML();
@@ -329,7 +320,7 @@ pFont.addEventListener("input", () => {
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 });
 
-align.addEventListener("change", () => { setAlign(align.value); });
+align.addEventListener("change", () => setAlign(align.value));
 
 btnFullscreen.onclick = toggleFullscreen;
 btnMirror.onclick = toggleMirror;
@@ -338,37 +329,34 @@ pMirror.onclick = toggleMirror;
 btnPresent.onclick = openPresent;
 pExit.onclick = closePresent;
 
-/* Formatting buttons */
+/* formatting buttons */
 fmtBold.onclick = () => exec("bold");
 fmtItalic.onclick = () => exec("italic");
 fmtUnderline.onclick = () => exec("underline");
 
-hlYellow.onclick = () => applyHighlight("#ffd400");
-hlGreen.onclick = () => applyHighlight("#00ff7b");
+tcYellow.onclick = () => setTextColor("#ffd400");
+tcGreen.onclick = () => setTextColor("#00ff7b");
+tcReset.onclick = () => setTextColor("#ffffff");
+
 hlBlue.onclick = () => applyHighlight("#4f7cff");
 hlPink.onclick = () => applyHighlight("#ff4fd8");
 hlClear.onclick = () => clearHighlight();
 
-/* Keyboard shortcuts (do not hijack typing in editor) */
+/* shortcuts */
 document.addEventListener("keydown", (e) => {
-  const target = (e.target && e.target.id) ? e.target.id : "";
-  const inEditor = target === "scriptInput";
+  const inEditor = (e.target && e.target.id) === "scriptInput";
 
-  // Editor shortcuts
   if(inEditor && (e.ctrlKey || e.metaKey)){
-    if(e.key.toLowerCase() === "b"){ e.preventDefault(); exec("bold"); }
-    if(e.key.toLowerCase() === "i"){ e.preventDefault(); exec("italic"); }
-    if(e.key.toLowerCase() === "u"){ e.preventDefault(); exec("underline"); }
+    const k = e.key.toLowerCase();
+    if(k === "b"){ e.preventDefault(); exec("bold"); }
+    if(k === "i"){ e.preventDefault(); exec("italic"); }
+    if(k === "u"){ e.preventDefault(); exec("underline"); }
     return;
   }
 
-  // Viewer shortcuts (when not editing)
   if(inEditor) return;
 
-  if(e.code === "Space"){
-    e.preventDefault();
-    togglePlay();
-  }
+  if(e.code === "Space"){ e.preventDefault(); togglePlay(); }
   if(e.key === "f" || e.key === "F"){ toggleFullscreen(); }
   if(e.key === "m" || e.key === "M"){ toggleMirror(); }
   if(e.key === "r" || e.key === "R"){ pause(); resetScroll(); }
@@ -379,7 +367,7 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "-"){ fontSize.value = String(Math.max(18, Number(fontSize.value)-2)); fontSize.dispatchEvent(new Event("input")); }
 });
 
-/* Init */
+/* init */
 renderTabs();
 loadActiveHTML();
 syncTeleprompterHTML();
