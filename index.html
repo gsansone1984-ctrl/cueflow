@@ -9,7 +9,6 @@
 <body>
 <div id="appRoot">
 
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="brand">
       <img src="logo.svg" class="brand-logo" alt="CueFlow logo" />
@@ -19,101 +18,51 @@
       </div>
     </div>
 
-    <!-- Mobile / Tablet view switch -->
-    <div class="view-switch" id="viewSwitch">
-      <button id="btnViewEdit" class="switch-btn active">Edit Script</button>
-      <button id="btnViewPrompt" class="switch-btn">Teleprompter</button>
-    </div>
-
-    <!-- Desktop actions -->
     <div class="top-actions">
-      <button id="btnMirror" class="action-btn">Mirror</button>
-      <button id="btnSiteMirror" class="action-btn">Site Mirror</button>
-      <button id="btnFullscreen" class="action-btn">Fullscreen</button>
-      <button id="btnPresent" class="action-btn primary">Present</button>
+      <button id="btnMode" class="action-btn primary" type="button">Play</button>
+      <button id="btnReset" class="action-btn" type="button">Reset</button>
+      <button id="btnMirror" class="action-btn" type="button">Mirror</button>
+      <button id="btnSiteMirror" class="action-btn" type="button">Site Mirror</button>
+      <button id="btnFullscreen" class="action-btn" type="button">Fullscreen</button>
+      <button id="btnPresent" class="action-btn" type="button">Present</button>
     </div>
 
-    <!-- Right side -->
     <div class="top-right">
       <div class="top-meta">
         <span>© Sansone 2026</span>
         <a href="#" id="aboutLink" class="about-top">About</a>
       </div>
 
-      <button id="btnMenu" class="menu-btn">Menu ▾</button>
+      <button id="btnMenu" class="menu-btn" type="button" aria-expanded="false" aria-controls="mobileMenu">
+        Menu ▾
+      </button>
 
-      <div id="mobileMenu" class="mobile-menu hidden">
-        <button id="mBtnMirror" class="menu-item">Mirror</button>
-        <button id="mBtnSiteMirror" class="menu-item">Site Mirror</button>
-        <button id="mBtnFullscreen" class="menu-item">Fullscreen</button>
-        <button id="mBtnPresent" class="menu-item primary">Present</button>
+      <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Menu">
+        <button id="mBtnMode" class="menu-item primary" role="menuitem" type="button">Play</button>
+        <button id="mBtnReset" class="menu-item" role="menuitem" type="button">Reset</button>
+        <button id="mBtnMirror" class="menu-item" role="menuitem" type="button">Mirror</button>
+        <button id="mBtnSiteMirror" class="menu-item" role="menuitem" type="button">Site Mirror</button>
+        <button id="mBtnFullscreen" class="menu-item" role="menuitem" type="button">Fullscreen</button>
+        <button id="mBtnPresent" class="menu-item" role="menuitem" type="button">Present</button>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="layout">
-
-    <!-- SCRIPT -->
-    <section class="panel editor" id="editorPanel">
-      <div class="panel-head">
-        <div class="panel-title">Script</div>
-        <button id="btnCollapseEditor" class="collapse-btn">
-          <span id="collapseIcon">◀</span>
-        </button>
-      </div>
-
-      <div class="tabs" id="slots"></div>
-
-      <div class="formatbar">
-        <div class="format-left">
-          <button class="btn tiny" id="fmtBold">B</button>
-          <button class="btn tiny" id="fmtItalic">I</button>
-          <button class="btn tiny" id="fmtUnderline">U</button>
-        </div>
-
-        <div class="format-group">
-          <span class="label">Text</span>
-          <button class="btn tiny chip" id="tcYellow">Yellow</button>
-          <button class="btn tiny chip" id="tcGreen">Green</button>
-          <button class="btn tiny secondary" id="tcReset">Reset</button>
-        </div>
-
-        <div class="format-group">
-          <span class="label">Highlight</span>
-          <button class="btn tiny chip" id="hlBlue">Blue</button>
-          <button class="btn tiny chip" id="hlPink">Pink</button>
-          <button class="btn tiny secondary" id="hlClear">Clear</button>
-        </div>
-      </div>
-
-      <div id="scriptInput" class="rte" contenteditable="true"></div>
-
-      <div class="row">
-        <button id="btnClear" class="btn danger">Clear</button>
-      </div>
-
-      <div class="hint">No saving. Refresh clears everything.</div>
-    </section>
-
-    <!-- TELEPROMPTER -->
-    <section class="panel prompter" id="prompterPanel">
+    <section class="panel" id="mainPanel">
       <div class="panel-title">Teleprompter</div>
 
       <div class="controls">
-        <button id="btnPlay" class="btn primary">Play</button>
-        <button id="btnReset" class="btn secondary">Reset</button>
-
         <div class="control-group">
           <label>Speed</label>
           <input id="speed" type="range" min="5" max="200" value="60" />
-          <span id="speedVal">60</span>
+          <span id="speedVal" class="mono">60</span>
         </div>
 
         <div class="control-group">
           <label>Text</label>
           <input id="fontSize" type="range" min="18" max="72" value="40" />
-          <span id="fontVal">40</span>
+          <span id="fontVal" class="mono">40</span>
         </div>
 
         <div class="control-group">
@@ -124,26 +73,51 @@
             <option value="right">Right</option>
           </select>
         </div>
+
+        <button id="btnClear" class="btn danger" type="button">Clear</button>
+      </div>
+
+      <div class="formatbar">
+        <div class="format-left">
+          <button class="btn tiny" id="fmtBold" type="button" title="Bold">B</button>
+          <button class="btn tiny" id="fmtItalic" type="button" title="Italic">I</button>
+          <button class="btn tiny" id="fmtUnderline" type="button" title="Underline">U</button>
+        </div>
+
+        <div class="format-group">
+          <span class="label">Text</span>
+          <button class="btn tiny chip" id="tcYellow" type="button">Yellow</button>
+          <button class="btn tiny chip" id="tcGreen" type="button">Green</button>
+          <button class="btn tiny secondary" id="tcReset" type="button">Reset</button>
+        </div>
+
+        <div class="format-group">
+          <span class="label">Highlight</span>
+          <button class="btn tiny chip" id="hlBlue" type="button">Blue</button>
+          <button class="btn tiny chip" id="hlPink" type="button">Pink</button>
+          <button class="btn tiny secondary" id="hlClear" type="button">Clear</button>
+        </div>
       </div>
 
       <div class="viewer-wrap" id="viewerWrap">
-        <div class="viewer">
+        <div class="viewer" id="viewer">
           <div id="scrollLayer" class="scroll-layer">
-            <div id="content" class="content"></div>
+            <!-- SINGLE SOURCE OF TRUTH: editable script content -->
+            <div id="script" class="script" contenteditable="true" spellcheck="false"></div>
           </div>
         </div>
       </div>
-    </section>
 
+      <div class="hint">No saving. Refresh clears everything.</div>
+    </section>
   </main>
 
   <!-- ABOUT MODAL -->
-  <div id="aboutModal" class="modal hidden">
+  <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
     <div class="modal-card">
-
       <div class="modal-head">
         <div class="modal-title">About</div>
-        <button id="aboutClose" class="btn tiny secondary">Close</button>
+        <button id="aboutClose" class="btn tiny secondary" type="button">Close</button>
       </div>
 
       <div class="modal-body">
@@ -173,6 +147,7 @@
         <hr class="about-hr" />
 
         <h3>Acceptable Use</h3>
+        <p>Lawful and ethical use only. The following activities are strictly prohibited:</p>
         <ul>
           <li>Illegal content or activities</li>
           <li>Fraud, scams, impersonation, or deceptive practices</li>
@@ -182,28 +157,51 @@
           <li>Copyright, privacy, or intellectual property violations</li>
           <li>Any use intended to cause harm to people or organizations</li>
         </ul>
-
-        <p>
-          Any misuse of CueFlow for unlawful or unethical purposes is
-          <strong>the sole responsibility of the user</strong>.
-        </p>
+        <p><strong>Any misuse is the sole responsibility of the user.</strong></p>
 
         <hr class="about-hr" />
 
         <h3>Terms</h3>
-        <p>
-          By using CueFlow, you acknowledge and agree to comply with these terms of use.
-        </p>
+        <p>By using CueFlow, you acknowledge and agree to comply with these terms of use.</p>
 
         <hr class="about-hr" />
 
         <h3>Contact</h3>
         <p>
           <strong>LinkedIn:</strong>
-          <a href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank">
+          <a class="about-link" href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank" rel="noopener noreferrer">
             Giuseppe Sansone
           </a>
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRESENT -->
+  <div id="presentOverlay" class="present hidden">
+    <div class="present-controls">
+      <button id="pMode" class="btn primary" type="button">Play</button>
+      <button id="pReset" class="btn secondary" type="button">Reset</button>
+      <button id="pExit" class="btn danger" type="button">Exit</button>
+
+      <div class="mini">
+        <span class="tag">Speed</span>
+        <input id="pSpeed" type="range" min="5" max="200" value="60" />
+        <span id="pSpeedVal" class="mono">60</span>
+      </div>
+
+      <div class="mini">
+        <span class="tag">Text</span>
+        <input id="pFont" type="range" min="18" max="96" value="56" />
+        <span id="pFontVal" class="mono">56</span>
+      </div>
+
+      <button id="pMirror" class="btn secondary" type="button">Mirror</button>
+    </div>
+
+    <div class="present-view" id="presentView">
+      <div id="presentScrollLayer" class="present-scroll-layer">
+        <div id="presentScript" class="present-script"></div>
       </div>
     </div>
   </div>
@@ -213,4 +211,5 @@
 <script src="app.js"></script>
 </body>
 </html>
+
 
