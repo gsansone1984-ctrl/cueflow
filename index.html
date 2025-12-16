@@ -4,9 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CueFlow</title>
-
-  <!-- Cache-bust (cambia numero se serve) -->
-  <link rel="stylesheet" href="style.css?v=1" />
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 
 <body>
@@ -52,11 +50,13 @@
       <label class="ctrl">
         <span>Speed</span>
         <input type="range" id="speed" min="10" max="220" value="70" />
+        <span id="speedVal" class="val">70</span>
       </label>
 
       <label class="ctrl">
         <span>Text</span>
         <input type="range" id="size" min="18" max="72" value="40" />
+        <span id="sizeVal" class="val">40</span>
       </label>
 
       <label class="ctrl">
@@ -67,15 +67,38 @@
           <option value="right">Right</option>
         </select>
       </label>
+
+      <button id="clearBtn" class="btn danger" type="button">Clear</button>
+    </div>
+
+    <!-- Formatting bar -->
+    <div class="formatbar" aria-label="Formatting">
+      <div class="fmt-group">
+        <button id="fmtBold" class="btn tiny" type="button" title="Bold (Ctrl/⌘+B)">B</button>
+        <button id="fmtItalic" class="btn tiny" type="button" title="Italic (Ctrl/⌘+I)">I</button>
+        <button id="fmtUnderline" class="btn tiny" type="button" title="Underline (Ctrl/⌘+U)">U</button>
+      </div>
+
+      <div class="fmt-group">
+        <span class="fmt-label">Text</span>
+        <button id="tcYellow" class="btn tiny chip" type="button">Yellow</button>
+        <button id="tcGreen" class="btn tiny chip" type="button">Green</button>
+        <button id="tcReset" class="btn tiny secondary" type="button">Reset</button>
+      </div>
+
+      <div class="fmt-group">
+        <span class="fmt-label">Highlight</span>
+        <button id="hlBlue" class="btn tiny chip" type="button">Blue</button>
+        <button id="hlPink" class="btn tiny chip" type="button">Pink</button>
+        <button id="hlClear" class="btn tiny secondary" type="button">Clear</button>
+      </div>
     </div>
 
     <!-- Teleprompter -->
-    <section id="viewer" class="viewer">
-      <!-- scroll translate happens here -->
+    <section id="viewer" class="viewer" aria-label="Teleprompter">
       <div id="scrollLayer" class="scroll-layer">
-        <!-- mirror happens here (pro mirror only for text) -->
         <div id="mirrorLayer" class="mirror-layer">
-          <div id="script" class="script" contenteditable="true" spellcheck="false"></div>
+          <div id="script" class="script" contenteditable="true" spellcheck="false" aria-label="Script editor"></div>
         </div>
       </div>
     </section>
@@ -83,7 +106,7 @@
     <div class="hint">No saving. Refresh clears everything.</div>
   </main>
 
-  <!-- ABOUT MODAL -->
+  <!-- ABOUT -->
   <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
     <div class="modal-box">
       <div class="modal-head">
@@ -130,7 +153,7 @@
     </div>
   </div>
 
-  <!-- PRESENT MODE (SEPARATE) -->
+  <!-- PRESENT MODE -->
   <div id="presentOverlay" class="present hidden" aria-label="Present mode">
     <div class="present-bar">
       <button id="pPlayBtn" class="btn btn-primary" type="button">Play</button>
@@ -141,11 +164,13 @@
       <div class="p-ctrl">
         <span>Speed</span>
         <input id="pSpeed" type="range" min="10" max="220" value="70" />
+        <span id="pSpeedVal" class="val">70</span>
       </div>
 
       <div class="p-ctrl">
         <span>Text</span>
         <input id="pSize" type="range" min="18" max="96" value="56" />
+        <span id="pSizeVal" class="val">56</span>
       </div>
     </div>
 
@@ -158,8 +183,7 @@
     </div>
   </div>
 
-  <!-- Cache-bust -->
-  <script src="app.js?v=1"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
 
