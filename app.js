@@ -68,37 +68,44 @@ let y = 0;
 let presentY = 0;
 let lastTs = null;
 
-function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+function triggerFadeMain(){
+  viewerWrap.classList.remove("fade-in");
+  void viewerWrap.offsetWidth;
+  viewerWrap.classList.add("fade-in");
+}
+function triggerFadePresent(){
+  presentOverlay.classList.remove("fade-in");
+  void presentOverlay.offsetWidth;
+  presentOverlay.classList.add("fade-in");
+}
 
-/* -------- menu -------- */
+/* menu */
 function openMobileMenu(){
   mobileMenu.classList.remove("hidden");
-  btnMenu.setAttribute("aria-expanded", "true");
+  btnMenu.setAttribute("aria-expanded","true");
 }
 function closeMobileMenu(){
   mobileMenu.classList.add("hidden");
-  btnMenu.setAttribute("aria-expanded", "false");
+  btnMenu.setAttribute("aria-expanded","false");
 }
 function toggleMobileMenu(){
   mobileMenu.classList.contains("hidden") ? openMobileMenu() : closeMobileMenu();
 }
 
-/* -------- about -------- */
+/* about */
 function openAbout(e){
   e?.preventDefault?.();
   aboutModal.classList.remove("hidden");
   closeMobileMenu();
 }
-function closeAbout(){
-  aboutModal.classList.add("hidden");
-}
+function closeAbout(){ aboutModal.classList.add("hidden"); }
 
-/* -------- sync to present -------- */
+/* sync */
 function syncPresent(){
   presentScript.innerHTML = script.innerHTML || "";
 }
 
-/* -------- scrolling offsets (start from bottom) -------- */
+/* start from bottom */
 function mainViewerH(){
   const h = viewerWrap?.clientHeight || 0;
   return h > 50 ? h : Math.floor(window.innerHeight * 0.6);
@@ -110,7 +117,7 @@ function presentViewerH(){
 function startOffsetMain(){ return Math.max(0, mainViewerH() - 70); }
 function startOffsetPresent(){ return Math.max(0, presentViewerH() - 140); }
 
-/* -------- scrolling -------- */
+/* scroll */
 function resetScroll(){
   y = 0; presentY = 0; lastTs = null;
   applyScroll();
@@ -137,7 +144,7 @@ function applyScroll(){
   presentScrollLayer.style.transform = `translateY(${startOffsetPresent() - presentY}px)`;
 }
 
-/* -------- play/pause -------- */
+/* play */
 function pxPerSec(){ return Number(speed.value) * 6; }
 
 function tick(ts){
@@ -162,12 +169,16 @@ function setModeLabels(){
 function play(){
   if(isPlaying) return;
   isPlaying = true;
+
   // lock editing while playing
-  script.setAttribute("contenteditable", "false");
-  script.classList.add("locked");
+  script.setAttribute("contenteditable","false");
 
   syncPresent();
   setModeLabels();
+
+  triggerFadeMain();
+  if(!presentOverlay.classList.contains("hidden")) triggerFadePresent();
+
   rafId = requestAnimationFrame(tick);
 }
 
@@ -178,9 +189,7 @@ function pause(){
   lastTs = null;
 
   // unlock editing
-  script.setAttribute("contenteditable", "true");
-  script.classList.remove("locked");
-
+  script.setAttribute("contenteditable","true");
   setModeLabels();
 }
 
@@ -188,7 +197,7 @@ function togglePlay(){
   isPlaying ? pause() : play();
 }
 
-/* -------- formatting -------- */
+/* formatting */
 function focusScript(){ script.focus(); }
 
 function exec(cmd){
@@ -211,7 +220,7 @@ function applyHighlight(color){
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
 
-/* -------- view tools -------- */
+/* view tools */
 function setFont(px){
   script.style.fontSize = `${px}px`;
   presentScript.style.fontSize = `${Math.max(px, 40) + 16}px`;
@@ -225,9 +234,8 @@ function toggleMirror(){
   viewerWrap.classList.toggle("mirrored");
   presentOverlay.classList.toggle("mirroredPresent");
 }
-function toggleSiteMirror(){
-  document.body.classList.toggle("site-mirrored");
-}
+function toggleSiteMirror(){ document.body.classList.toggle("site-mirrored"); }
+
 function toggleFullscreen(){
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen?.();
@@ -236,7 +244,7 @@ function toggleFullscreen(){
   }
 }
 
-/* -------- present -------- */
+/* present */
 function openPresent(){
   syncPresent();
   presentOverlay.classList.remove("hidden");
@@ -250,13 +258,16 @@ function openPresent(){
 
   closeMobileMenu();
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
+
+  triggerFadePresent();
 }
+
 function closePresent(){
   presentOverlay.classList.add("hidden");
   if(document.fullscreenElement) document.exitFullscreen?.();
 }
 
-/* -------- clear (no saving) -------- */
+/* clear */
 function clearAll(){
   pause();
   script.innerHTML = "";
@@ -266,7 +277,7 @@ function clearAll(){
   closeAbout();
 }
 
-/* -------- bindings -------- */
+/* bindings */
 btnMode.onclick = togglePlay;
 mBtnMode.onclick = () => { togglePlay(); closeMobileMenu(); };
 pMode.onclick = togglePlay;
@@ -367,11 +378,9 @@ window.addEventListener("resize", () => {
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 });
 
-/* init */
+/* init: always empty (NO saving) */
 function init(){
-  // start empty (no saving)
   clearAll();
-
   speedVal.textContent = speed.value;
   fontVal.textContent = fontSize.value;
 
@@ -381,5 +390,7 @@ function init(){
   setModeLabels();
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
+
 init();
+
 
