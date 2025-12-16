@@ -9,14 +9,11 @@
 <body>
 <div id="appRoot">
 
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="brand" aria-label="CueFlow">
-      <!-- SOLO LOGO -->
       <img src="logo.svg" class="brand-logo" alt="CueFlow logo" />
     </div>
 
-    <!-- Desktop actions -->
     <div class="top-actions" aria-label="Actions">
       <button id="btnMode" class="action-btn primary" type="button">Play</button>
       <button id="btnReset" class="action-btn" type="button">Reset</button>
@@ -32,12 +29,10 @@
         <a href="#" id="aboutLink" class="about-top">About</a>
       </div>
 
-      <!-- Mobile menu button -->
       <button id="btnMenu" class="menu-btn" type="button" aria-expanded="false" aria-controls="mobileMenu">
         Menu ▾
       </button>
 
-      <!-- Mobile menu -->
       <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Mobile menu">
         <button id="mBtnMode" class="menu-item primary" role="menuitem" type="button">Play</button>
         <button id="mBtnReset" class="menu-item" role="menuitem" type="button">Reset</button>
@@ -49,7 +44,6 @@
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="layout">
     <section class="panel" id="mainPanel">
       <div class="panel-title">Teleprompter</div>
@@ -101,7 +95,6 @@
         </div>
       </div>
 
-      <!-- BIG VIEW AREA (paste here) -->
       <div class="viewer-wrap" id="viewerWrap">
         <div class="viewer" id="viewer">
           <div id="scrollLayer" class="scroll-layer">
@@ -212,6 +205,4 @@
 
 <script src="app.js"></script>
 </body>
-</html>
-
 </html>
