@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 
-/* Main */
+/* Viewer layers */
 const viewer = $("viewer");
 const editor = $("editor");
 const player = $("player");
@@ -16,7 +16,7 @@ const sizeVal = $("sizeVal");
 const align = $("align");
 const clearBtn = $("clearBtn");
 
-/* Actions */
+/* Desktop actions */
 const playBtn = $("playBtn");
 const resetBtn = $("resetBtn");
 const mirrorBtn = $("mirrorBtn");
@@ -81,15 +81,13 @@ function toggleMenu(){ menuPanel.classList.contains("hidden") ? openMenu() : clo
 
 /* About */
 function openAbout(){ aboutModal.classList.remove("hidden"); closeMenu(); }
-function closeAbout(){ aboutModal.classList.add("hidden"); }
+function closeAboutModal(){ aboutModal.classList.add("hidden"); }
 
-/* Paste reliability: always focus editor on tap/click */
-function focusEditor(){
-  scriptEditor.focus();
-}
+/* Focus */
+function focusEditor(){ scriptEditor.focus(); }
 viewer.addEventListener("pointerdown", () => { if(!playing) focusEditor(); });
 
-/* Sync editor -> player (for scrolling mode + present) */
+/* Sync */
 function syncPlayer(){
   scriptPlayer.innerHTML = scriptEditor.innerHTML || "";
   scriptPlayer.style.fontSize = `${size.value}px`;
@@ -101,11 +99,12 @@ function syncPlayer(){
   }
 }
 
-/* Scroll geometry */
+/* Geometry */
 function startOffset(el, pad){
   const h = el.clientHeight || 0;
   return Math.max(0, h - pad);
 }
+
 function applyTransforms(){
   const start = startOffset(viewer, 80);
   scrollLayer.style.transform = `translateY(${start - y}px)`;
@@ -115,6 +114,7 @@ function applyTransforms(){
     pScrollLayer.style.transform = `translateY(${pStart - pY}px)`;
   }
 }
+
 function clampScroll(){
   const vh = viewer.clientHeight || 1;
   const start = startOffset(viewer, 80);
@@ -133,21 +133,37 @@ function clampScroll(){
     pY = Math.min(Math.max(pY, 0), pMax);
   }
 }
+
 function resetScroll(){
   y = 0;
   pY = 0;
   lastTs = null;
+
+  // keep editor in sync
+  editor.scrollTop = 0;
+
   applyTransforms();
 }
 
+/* Core improvement:
+   y is always tied to editor.scrollTop when NOT playing.
+   When you scroll/edit in editor, then press Play, teleprompter starts from that point. */
+editor.addEventListener("scroll", () => {
+  if(playing) return;
+  y = editor.scrollTop;
+  applyTransforms();
+});
+
 /* Play */
 function pxPerSec(){ return Number(speed.value) * 6; }
+
 function setLabels(){
   const t = playing ? "Pause" : "Play";
   playBtn.textContent = t;
   mPlayBtn.textContent = t;
   pPlayBtn.textContent = t;
 }
+
 function tick(ts){
   if(!playing) return;
   if(lastTs === null) lastTs = ts;
@@ -165,7 +181,10 @@ function play(){
   if(playing) return;
   playing = true;
 
-  // swap: editor OFF, player ON
+  // start from editor position
+  y = editor.scrollTop;
+
+  // show player
   editor.classList.add("hidden");
   player.classList.remove("hidden");
 
@@ -180,7 +199,9 @@ function pause(){
   raf = null;
   lastTs = null;
 
-  // swap back: editor ON, player OFF
+  // return to editor at same position
+  editor.scrollTop = y;
+
   player.classList.add("hidden");
   editor.classList.remove("hidden");
 
@@ -190,7 +211,7 @@ function pause(){
 
 function togglePlay(){ playing ? pause() : play(); }
 
-/* Mirror (pro = only player text / present text) */
+/* Mirror */
 function toggleMirror(){
   viewer.classList.toggle("mirrored");
   if(isPresentOpen()) pViewer.classList.toggle("mirrored");
@@ -207,7 +228,6 @@ async function toggleFullscreen(){
 /* Present */
 function openPresent(){
   syncPlayer();
-
   pSpeed.value = speed.value;
   pSpeedVal.textContent = pSpeed.value;
 
@@ -218,12 +238,12 @@ function openPresent(){
   presentOverlay.classList.remove("hidden");
   pViewer.classList.toggle("mirrored", viewer.classList.contains("mirrored"));
 
-  resetScroll();
+  // align present with current position
+  clampScroll();
   applyTransforms();
 }
-function closePresent(){
-  presentOverlay.classList.add("hidden");
-}
+
+function closePresent(){ presentOverlay.classList.add("hidden"); }
 
 /* Clear */
 function clearAll(){
@@ -233,31 +253,28 @@ function clearAll(){
   pScript.innerHTML = "";
   resetScroll();
   closeMenu();
-  closeAbout();
+  closeAboutModal();
 }
 
-/* Formatting (works on editor) */
+/* Formatting */
 function exec(cmd){
   focusEditor();
   document.execCommand(cmd, false, null);
   syncPlayer();
-  requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 }
 function setTextColor(color){
   focusEditor();
   document.execCommand("foreColor", false, color);
   syncPlayer();
-  requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 }
 function setHighlight(color){
   focusEditor();
   const ok = document.execCommand("backColor", false, color);
   if(!ok) document.execCommand("hiliteColor", false, color);
   syncPlayer();
-  requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 }
 
-/* Bind */
+/* Bind controls */
 speed.addEventListener("input", () => {
   speedVal.textContent = speed.value;
   if(isPresentOpen()){ pSpeed.value = speed.value; pSpeedVal.textContent = speed.value; }
@@ -285,7 +302,6 @@ resetBtn.onclick = () => { pause(); resetScroll(); };
 mirrorBtn.onclick = toggleMirror;
 fullBtn.onclick = toggleFullscreen;
 presentBtn.onclick = openPresent;
-
 clearBtn.onclick = clearAll;
 
 /* Mobile menu */
@@ -299,8 +315,8 @@ mAboutBtn.onclick = openAbout;
 
 /* About */
 aboutBtn.onclick = openAbout;
-aboutClose.onclick = closeAbout;
-aboutModal.addEventListener("click", (e) => { if(e.target === aboutModal) closeAbout(); });
+aboutClose.onclick = closeAboutModal;
+aboutModal.addEventListener("click", (e) => { if(e.target === aboutModal) closeAboutModal(); });
 
 /* Present controls */
 pPlayBtn.onclick = togglePlay;
@@ -332,7 +348,7 @@ hlBlue.onclick = () => setHighlight("#4F7CFF");
 hlPink.onclick = () => setHighlight("#FF4FD8");
 hlClear.onclick = () => setHighlight("transparent");
 
-/* Click outside menu closes it */
+/* Close menu clicking outside */
 document.addEventListener("click", (e) => {
   if(menuPanel.classList.contains("hidden")) return;
   const inside = menuPanel.contains(e.target) || menuBtn.contains(e.target);
@@ -356,13 +372,14 @@ document.addEventListener("keydown", (e) => {
   }
   if(e.key === "Escape"){
     closeMenu();
-    closeAbout();
+    closeAboutModal();
     if(isPresentOpen()) closePresent();
   }
 });
 
-/* Init: no saving */
+/* Init */
 window.addEventListener("load", () => {
+  // no saving
   scriptEditor.innerHTML = "";
   scriptEditor.style.fontSize = `${size.value}px`;
   scriptEditor.style.textAlign = align.value;
@@ -374,7 +391,6 @@ window.addEventListener("load", () => {
   setLabels();
   resetScroll();
 
-  // allow immediate paste
   setTimeout(() => focusEditor(), 50);
 });
 
