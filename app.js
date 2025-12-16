@@ -2,8 +2,11 @@ const $ = (id) => document.getElementById(id);
 
 /* Main */
 const viewer = $("viewer");
+const editor = $("editor");
+const player = $("player");
+const scriptEditor = $("scriptEditor");
 const scrollLayer = $("scrollLayer");
-const script = $("script");
+const scriptPlayer = $("scriptPlayer");
 
 /* Controls */
 const speed = $("speed");
@@ -13,7 +16,7 @@ const sizeVal = $("sizeVal");
 const align = $("align");
 const clearBtn = $("clearBtn");
 
-/* Desktop actions */
+/* Actions */
 const playBtn = $("playBtn");
 const resetBtn = $("resetBtn");
 const mirrorBtn = $("mirrorBtn");
@@ -34,11 +37,9 @@ const mAboutBtn = $("mAboutBtn");
 const fmtBold = $("fmtBold");
 const fmtItalic = $("fmtItalic");
 const fmtUnderline = $("fmtUnderline");
-
 const tcYellow = $("tcYellow");
 const tcGreen = $("tcGreen");
 const tcReset = $("tcReset");
-
 const hlBlue = $("hlBlue");
 const hlPink = $("hlPink");
 const hlClear = $("hlClear");
@@ -53,12 +54,10 @@ const presentOverlay = $("presentOverlay");
 const pViewer = $("pViewer");
 const pScrollLayer = $("pScrollLayer");
 const pScript = $("pScript");
-
 const pPlayBtn = $("pPlayBtn");
 const pResetBtn = $("pResetBtn");
 const pMirrorBtn = $("pMirrorBtn");
 const pExitBtn = $("pExitBtn");
-
 const pSpeed = $("pSpeed");
 const pSpeedVal = $("pSpeedVal");
 const pSize = $("pSize");
@@ -75,71 +74,65 @@ function isPresentOpen(){
   return !presentOverlay.classList.contains("hidden");
 }
 
-/* Ensure editor focus works (fix paste issues) */
-function focusEditor(){
-  script.focus();
-}
-viewer.addEventListener("pointerdown", () => {
-  if (!playing) focusEditor();
-});
-
 /* Menu */
-function openMenu(){
-  menuPanel.classList.remove("hidden");
-  menuBtn.setAttribute("aria-expanded", "true");
-}
-function closeMenu(){
-  menuPanel.classList.add("hidden");
-  menuBtn.setAttribute("aria-expanded", "false");
-}
-function toggleMenu(){
-  menuPanel.classList.contains("hidden") ? openMenu() : closeMenu();
-}
+function openMenu(){ menuPanel.classList.remove("hidden"); menuBtn.setAttribute("aria-expanded","true"); }
+function closeMenu(){ menuPanel.classList.add("hidden"); menuBtn.setAttribute("aria-expanded","false"); }
+function toggleMenu(){ menuPanel.classList.contains("hidden") ? openMenu() : closeMenu(); }
 
 /* About */
-function openAbout(){
-  aboutModal.classList.remove("hidden");
-  closeMenu();
+function openAbout(){ aboutModal.classList.remove("hidden"); closeMenu(); }
+function closeAbout(){ aboutModal.classList.add("hidden"); }
+
+/* Paste reliability: always focus editor on tap/click */
+function focusEditor(){
+  scriptEditor.focus();
 }
-function closeAboutModal(){
-  aboutModal.classList.add("hidden");
+viewer.addEventListener("pointerdown", () => { if(!playing) focusEditor(); });
+
+/* Sync editor -> player (for scrolling mode + present) */
+function syncPlayer(){
+  scriptPlayer.innerHTML = scriptEditor.innerHTML || "";
+  scriptPlayer.style.fontSize = `${size.value}px`;
+  scriptPlayer.style.textAlign = align.value;
+
+  if(isPresentOpen()){
+    pScript.innerHTML = scriptEditor.innerHTML || "";
+    pScript.style.textAlign = align.value;
+  }
 }
 
-/* Scroll helpers */
+/* Scroll geometry */
 function startOffset(el, pad){
   const h = el.clientHeight || 0;
   return Math.max(0, h - pad);
 }
-
 function applyTransforms(){
-  const mainStart = startOffset(viewer, 80);
-  scrollLayer.style.transform = `translateY(${mainStart - y}px)`;
+  const start = startOffset(viewer, 80);
+  scrollLayer.style.transform = `translateY(${start - y}px)`;
 
   if(isPresentOpen()){
     const pStart = startOffset(pViewer, 140);
     pScrollLayer.style.transform = `translateY(${pStart - pY}px)`;
   }
 }
-
 function clampScroll(){
-  const mainH = viewer.clientHeight || 1;
-  const mainStart = startOffset(viewer, 80);
-  const totalMain = script.scrollHeight + mainStart;
-  const maxMain = Math.max(0, totalMain - mainH + 60);
-  y = Math.min(Math.max(y, 0), maxMain);
+  const vh = viewer.clientHeight || 1;
+  const start = startOffset(viewer, 80);
+  const total = scriptPlayer.scrollHeight + start;
+  const maxY = Math.max(0, total - vh + 60);
+  y = Math.min(Math.max(y, 0), maxY);
 
   if(isPresentOpen()){
     const pH = pViewer.clientHeight || 1;
     const pStart = startOffset(pViewer, 140);
-    const totalP = pScript.scrollHeight + pStart;
-    const maxP = Math.max(0, totalP - pH + 120);
+    const pTotal = pScript.scrollHeight + pStart;
+    const pMax = Math.max(0, pTotal - pH + 120);
 
-    const ratio = maxMain === 0 ? 0 : (y / maxMain);
-    pY = ratio * maxP;
-    pY = Math.min(Math.max(pY, 0), maxP);
+    const ratio = maxY === 0 ? 0 : (y / maxY);
+    pY = ratio * pMax;
+    pY = Math.min(Math.max(pY, 0), pMax);
   }
 }
-
 function resetScroll(){
   y = 0;
   pY = 0;
@@ -148,10 +141,13 @@ function resetScroll(){
 }
 
 /* Play */
-function pxPerSec(){
-  return Number(speed.value) * 6;
+function pxPerSec(){ return Number(speed.value) * 6; }
+function setLabels(){
+  const t = playing ? "Pause" : "Play";
+  playBtn.textContent = t;
+  mPlayBtn.textContent = t;
+  pPlayBtn.textContent = t;
 }
-
 function tick(ts){
   if(!playing) return;
   if(lastTs === null) lastTs = ts;
@@ -165,26 +161,16 @@ function tick(ts){
   raf = requestAnimationFrame(tick);
 }
 
-function setPlayLabels(){
-  const label = playing ? "Pause" : "Play";
-  playBtn.textContent = label;
-  mPlayBtn.textContent = label;
-  pPlayBtn.textContent = label;
-}
-
-function syncPresent(){
-  if(isPresentOpen()){
-    pScript.innerHTML = script.innerHTML || "";
-    pScript.style.textAlign = align.value;
-  }
-}
-
 function play(){
   if(playing) return;
   playing = true;
-  script.setAttribute("contenteditable", "false");
-  syncPresent();
-  setPlayLabels();
+
+  // swap: editor OFF, player ON
+  editor.classList.add("hidden");
+  player.classList.remove("hidden");
+
+  syncPlayer();
+  setLabels();
   raf = requestAnimationFrame(tick);
 }
 
@@ -193,15 +179,18 @@ function pause(){
   if(raf) cancelAnimationFrame(raf);
   raf = null;
   lastTs = null;
-  script.setAttribute("contenteditable", "true");
-  setPlayLabels();
+
+  // swap back: editor ON, player OFF
+  player.classList.add("hidden");
+  editor.classList.remove("hidden");
+
+  setLabels();
+  focusEditor();
 }
 
-function togglePlay(){
-  playing ? pause() : play();
-}
+function togglePlay(){ playing ? pause() : play(); }
 
-/* Mirror pro (text only) */
+/* Mirror (pro = only player text / present text) */
 function toggleMirror(){
   viewer.classList.toggle("mirrored");
   if(isPresentOpen()) pViewer.classList.toggle("mirrored");
@@ -210,17 +199,15 @@ function toggleMirror(){
 /* Fullscreen */
 async function toggleFullscreen(){
   try{
-    if(!document.fullscreenElement){
-      await document.documentElement.requestFullscreen();
-    }else{
-      await document.exitFullscreen();
-    }
+    if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
+    else await document.exitFullscreen();
   }catch(_){}
 }
 
 /* Present */
 function openPresent(){
-  syncPresent();
+  syncPlayer();
+
   pSpeed.value = speed.value;
   pSpeedVal.textContent = pSpeed.value;
 
@@ -234,109 +221,86 @@ function openPresent(){
   resetScroll();
   applyTransforms();
 }
-
 function closePresent(){
   presentOverlay.classList.add("hidden");
 }
 
-/* Clear (no saving) */
+/* Clear */
 function clearAll(){
   pause();
-  script.innerHTML = "";
-  if(isPresentOpen()) pScript.innerHTML = "";
+  scriptEditor.innerHTML = "";
+  scriptPlayer.innerHTML = "";
+  pScript.innerHTML = "";
   resetScroll();
   closeMenu();
-  closeAboutModal();
+  closeAbout();
 }
 
-/* Formatting */
+/* Formatting (works on editor) */
 function exec(cmd){
   focusEditor();
   document.execCommand(cmd, false, null);
-  syncPresent();
+  syncPlayer();
   requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 }
-
 function setTextColor(color){
   focusEditor();
   document.execCommand("foreColor", false, color);
-  syncPresent();
+  syncPlayer();
   requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 }
-
 function setHighlight(color){
   focusEditor();
   const ok = document.execCommand("backColor", false, color);
   if(!ok) document.execCommand("hiliteColor", false, color);
-  syncPresent();
+  syncPlayer();
   requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 }
 
-/* Bind UI */
+/* Bind */
 speed.addEventListener("input", () => {
   speedVal.textContent = speed.value;
-  if(isPresentOpen()){
-    pSpeed.value = speed.value;
-    pSpeedVal.textContent = speed.value;
-  }
+  if(isPresentOpen()){ pSpeed.value = speed.value; pSpeedVal.textContent = speed.value; }
 });
 
 size.addEventListener("input", () => {
   sizeVal.textContent = size.value;
-  script.style.fontSize = `${size.value}px`;
-  if(isPresentOpen()){
-    pSize.value = Math.max(Number(size.value) + 16, 48);
-    pSizeVal.textContent = pSize.value;
-    pScript.style.fontSize = `${pSize.value}px`;
-  }
-  requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
+  scriptEditor.style.fontSize = `${size.value}px`;
+  syncPlayer();
 });
 
 align.addEventListener("change", () => {
-  script.style.textAlign = align.value;
-  if(isPresentOpen()) pScript.style.textAlign = align.value;
+  scriptEditor.style.textAlign = align.value;
+  syncPlayer();
 });
 
-clearBtn.onclick = clearAll;
-
-fmtBold.onclick = () => exec("bold");
-fmtItalic.onclick = () => exec("italic");
-fmtUnderline.onclick = () => exec("underline");
-
-tcYellow.onclick = () => setTextColor("#FFD400");
-tcGreen.onclick = () => setTextColor("#00FF7B");
-tcReset.onclick = () => setTextColor("#FFFFFF");
-
-hlBlue.onclick = () => setHighlight("#4F7CFF");
-hlPink.onclick = () => setHighlight("#FF4FD8");
-hlClear.onclick = () => setHighlight("transparent");
-
-/* Keep present synced while typing/pasting */
-script.addEventListener("input", () => {
-  syncPresent();
+scriptEditor.addEventListener("input", () => {
+  syncPlayer();
   requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 });
 
-/* Desktop buttons */
+/* Buttons */
 playBtn.onclick = togglePlay;
 resetBtn.onclick = () => { pause(); resetScroll(); };
 mirrorBtn.onclick = toggleMirror;
 fullBtn.onclick = toggleFullscreen;
-presentBtn.onclick = () => { closeMenu(); openPresent(); };
+presentBtn.onclick = openPresent;
 
-/* Mobile menu buttons */
+clearBtn.onclick = clearAll;
+
+/* Mobile menu */
 menuBtn.onclick = toggleMenu;
 mPlayBtn.onclick = () => { togglePlay(); closeMenu(); };
 mResetBtn.onclick = () => { pause(); resetScroll(); closeMenu(); };
 mMirrorBtn.onclick = () => { toggleMirror(); closeMenu(); };
 mFullBtn.onclick = () => { toggleFullscreen(); closeMenu(); };
-mPresentBtn.onclick = () => { closeMenu(); openPresent(); };
+mPresentBtn.onclick = () => { openPresent(); closeMenu(); };
 mAboutBtn.onclick = openAbout;
 
 /* About */
 aboutBtn.onclick = openAbout;
-aboutClose.onclick = closeAboutModal;
-aboutModal.addEventListener("click", (e) => { if(e.target === aboutModal) closeAboutModal(); });
+aboutClose.onclick = closeAbout;
+aboutModal.addEventListener("click", (e) => { if(e.target === aboutModal) closeAbout(); });
 
 /* Present controls */
 pPlayBtn.onclick = togglePlay;
@@ -349,10 +313,24 @@ pSpeed.addEventListener("input", () => {
   speedVal.textContent = speed.value;
   pSpeedVal.textContent = pSpeed.value;
 });
+
 pSize.addEventListener("input", () => {
   pSizeVal.textContent = pSize.value;
   pScript.style.fontSize = `${pSize.value}px`;
 });
+
+/* Formatting buttons */
+fmtBold.onclick = () => exec("bold");
+fmtItalic.onclick = () => exec("italic");
+fmtUnderline.onclick = () => exec("underline");
+
+tcYellow.onclick = () => setTextColor("#FFD400");
+tcGreen.onclick = () => setTextColor("#00FF7B");
+tcReset.onclick = () => setTextColor("#FFFFFF");
+
+hlBlue.onclick = () => setHighlight("#4F7CFF");
+hlPink.onclick = () => setHighlight("#FF4FD8");
+hlClear.onclick = () => setHighlight("transparent");
 
 /* Click outside menu closes it */
 document.addEventListener("click", (e) => {
@@ -361,11 +339,10 @@ document.addEventListener("click", (e) => {
   if(!inside) closeMenu();
 });
 
-/* Keyboard shortcuts */
+/* Shortcuts */
 document.addEventListener("keydown", (e) => {
-  const inEditor = (e.target && e.target.id) === "script";
+  const inEditor = (e.target && e.target.id) === "scriptEditor";
 
-  // Formatting shortcuts inside editor
   if(inEditor && (e.ctrlKey || e.metaKey)){
     const k = e.key.toLowerCase();
     if(k === "b"){ e.preventDefault(); exec("bold"); }
@@ -373,31 +350,31 @@ document.addEventListener("keydown", (e) => {
     if(k === "u"){ e.preventDefault(); exec("underline"); }
   }
 
-  // Global shortcuts
   if(e.code === "Space" && !inEditor){
     e.preventDefault();
     togglePlay();
   }
   if(e.key === "Escape"){
     closeMenu();
-    closeAboutModal();
+    closeAbout();
     if(isPresentOpen()) closePresent();
   }
 });
 
-/* Init: empty on load, no saving */
+/* Init: no saving */
 window.addEventListener("load", () => {
-  script.innerHTML = "";
-  script.style.fontSize = `${size.value}px`;
-  script.style.textAlign = align.value;
+  scriptEditor.innerHTML = "";
+  scriptEditor.style.fontSize = `${size.value}px`;
+  scriptEditor.style.textAlign = align.value;
 
   speedVal.textContent = speed.value;
   sizeVal.textContent = size.value;
 
-  setPlayLabels();
+  syncPlayer();
+  setLabels();
   resetScroll();
 
-  // Important: allow immediate paste
+  // allow immediate paste
   setTimeout(() => focusEditor(), 50);
 });
 
