@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CueFlow</title>
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 
 <body>
@@ -93,16 +93,16 @@
 
     <!-- Teleprompter viewer -->
     <section id="viewer" class="viewer" aria-label="Teleprompter">
-      <!-- EDITOR (paste-safe) -->
+      <!-- EDITOR (scrollable + paste-safe) -->
       <div id="editor" class="editor">
-        <div id="scriptEditor" class="script editor-script" contenteditable="true" spellcheck="false"></div>
+        <div id="scriptEditor" class="editor-script" contenteditable="true" spellcheck="false"></div>
       </div>
 
-      <!-- PLAYER (animated text, not editable) -->
+      <!-- PLAYER (animated, not editable) -->
       <div id="player" class="player hidden" aria-hidden="true">
         <div id="scrollLayer" class="scroll-layer">
           <div id="mirrorLayer" class="mirror-layer">
-            <div id="scriptPlayer" class="script player-script"></div>
+            <div id="scriptPlayer" class="player-script"></div>
           </div>
         </div>
       </div>
@@ -118,7 +118,17 @@
         <div class="modal-title">About CueFlow</div>
         <button id="aboutClose" class="btn" type="button">Close</button>
       </div>
+
       <div class="modal-body">
+        <div class="about-hero">
+          <!-- Metti un file: giuseppe.jpg (o cambia src) -->
+          <img class="about-photo" src="giuseppe.jpg" alt="Giuseppe Sansone" />
+          <div class="about-name">
+            <div class="name">Giuseppe Sansone</div>
+            <div class="role">Creator of CueFlow</div>
+          </div>
+        </div>
+
         <p><strong>I built CueFlow because I needed a simple, clean teleprompter that matched the way I work.</strong>
         I tried several tools, but none had the exact features and workflow I wanted.</p>
 
@@ -129,10 +139,12 @@
         If it helps you, feel free to share it with your community.</p>
 
         <hr />
+
         <h3>Privacy</h3>
         <p>Your text is not saved and not sent anywhere. Refreshing the page clears everything.</p>
 
         <hr />
+
         <h3>Acceptable Use</h3>
         <ul>
           <li>Illegal content or activities</li>
@@ -144,6 +156,7 @@
         </ul>
 
         <hr />
+
         <h3>Contact</h3>
         <p>
           <a class="about-link" href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank" rel="noopener noreferrer">
@@ -184,7 +197,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
 
