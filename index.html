@@ -1,197 +1,94 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CueFlow — Teleprompter</title>
-  <link rel="stylesheet" href="style.css?v=9" />
+  <title>CueFlow</title>
+  <link rel="stylesheet" href="style.css?v=1">
 </head>
 <body>
-<div id="appRoot">
 
-  <header class="topbar">
-    <div class="brand" aria-label="CueFlow">
-      <img src="logo.svg" class="brand-logo" alt="CueFlow logo" />
-    </div>
+<header class="topbar">
+  <div class="logo">CF</div>
 
-    <div class="top-actions" aria-label="Actions">
-      <button id="btnMode" class="action-btn primary" type="button">Play</button>
-      <button id="btnReset" class="action-btn" type="button">Reset</button>
-      <button id="btnMirror" class="action-btn" type="button">Mirror</button>
-      <button id="btnSiteMirror" class="action-btn" type="button">Site Mirror</button>
-      <button id="btnFullscreen" class="action-btn" type="button">Fullscreen</button>
-      <button id="btnPresent" class="action-btn" type="button">Present</button>
-    </div>
-
-    <div class="top-right">
-      <div class="top-meta">
-        <span>© Sansone 2026</span>
-        <a href="#" id="aboutLink" class="about-top">About</a>
-      </div>
-
-      <button id="btnMenu" class="menu-btn" type="button" aria-expanded="false" aria-controls="mobileMenu">
-        Menu ▾
-      </button>
-
-      <div id="mobileMenu" class="mobile-menu hidden" role="menu" aria-label="Mobile menu">
-        <button id="mBtnMode" class="menu-item primary" role="menuitem" type="button">Play</button>
-        <button id="mBtnReset" class="menu-item" role="menuitem" type="button">Reset</button>
-        <button id="mBtnMirror" class="menu-item" role="menuitem" type="button">Mirror</button>
-        <button id="mBtnSiteMirror" class="menu-item" role="menuitem" type="button">Site Mirror</button>
-        <button id="mBtnFullscreen" class="menu-item" role="menuitem" type="button">Fullscreen</button>
-        <button id="mBtnPresent" class="menu-item" role="menuitem" type="button">Present</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="layout">
-    <section class="panel" id="mainPanel">
-      <div class="panel-title">Teleprompter</div>
-
-      <div class="controls">
-        <div class="control-group">
-          <label for="speed">Speed</label>
-          <input id="speed" type="range" min="5" max="200" value="60" />
-          <span id="speedVal" class="mono">60</span>
-        </div>
-
-        <div class="control-group">
-          <label for="fontSize">Text</label>
-          <input id="fontSize" type="range" min="18" max="72" value="40" />
-          <span id="fontVal" class="mono">40</span>
-        </div>
-
-        <div class="control-group">
-          <label for="align">Align</label>
-          <select id="align">
-            <option value="left">Left</option>
-            <option value="center" selected>Center</option>
-            <option value="right">Right</option>
-          </select>
-        </div>
-
-        <button id="btnClear" class="btn danger" type="button">Clear</button>
-      </div>
-
-      <div class="formatbar">
-        <div class="format-left">
-          <button class="btn tiny" id="fmtBold" type="button">B</button>
-          <button class="btn tiny" id="fmtItalic" type="button">I</button>
-          <button class="btn tiny" id="fmtUnderline" type="button">U</button>
-        </div>
-
-        <div class="format-group">
-          <span class="label">Text</span>
-          <button class="btn tiny chip" id="tcYellow" type="button">Yellow</button>
-          <button class="btn tiny chip" id="tcGreen" type="button">Green</button>
-          <button class="btn tiny secondary" id="tcReset" type="button">Reset</button>
-        </div>
-
-        <div class="format-group">
-          <span class="label">Highlight</span>
-          <button class="btn tiny chip" id="hlBlue" type="button">Blue</button>
-          <button class="btn tiny chip" id="hlPink" type="button">Pink</button>
-          <button class="btn tiny secondary" id="hlClear" type="button">Clear</button>
-        </div>
-      </div>
-
-      <div class="viewer-wrap" id="viewerWrap">
-        <div class="viewer" id="viewer">
-          <div id="scrollLayer" class="scroll-layer">
-            <div id="script" class="script" contenteditable="true" spellcheck="false"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hint">No saving. Refresh clears everything.</div>
-    </section>
-  </main>
-
-  <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div class="modal-title">About</div>
-        <button id="aboutClose" class="btn tiny secondary" type="button">Close</button>
-      </div>
-
-      <div class="modal-body">
-        <p><strong>I built CueFlow because I needed a simple, clean teleprompter that matched the way I work.</strong>
-        I tried several tools, but none had the exact features and workflow I was looking for.</p>
-
-        <p>So I built the teleprompter I wanted to use:
-        <strong>fast, distraction-free, and designed to work smoothly</strong>.</p>
-
-        <p><strong>CueFlow is free and will stay free.</strong>
-        If it helps you, feel free to share it with your community.</p>
-
-        <hr class="about-hr" />
-
-        <h3>Privacy</h3>
-        <p>Your text is <strong>not saved</strong>, <strong>not tracked</strong>, and <strong>not sent anywhere</strong>.
-        Refreshing the page clears everything.</p>
-
-        <hr class="about-hr" />
-
-        <h3>Acceptable Use</h3>
-        <p>Lawful and ethical use only. The following activities are strictly prohibited:</p>
-        <ul>
-          <li>Illegal content or activities</li>
-          <li>Fraud, scams, impersonation, or deceptive practices</li>
-          <li>Hate, violence, discrimination, or harassment</li>
-          <li>Terrorism, extremism, or criminal activities</li>
-          <li>Defamatory, abusive, or threatening content</li>
-          <li>Copyright, privacy, or intellectual property violations</li>
-          <li>Any use intended to cause harm to people or organizations</li>
-        </ul>
-        <p><strong>Any misuse is the sole responsibility of the user.</strong></p>
-
-        <hr class="about-hr" />
-
-        <h3>Terms</h3>
-        <p>By using CueFlow, you acknowledge and agree to comply with these terms of use.</p>
-
-        <hr class="about-hr" />
-
-        <h3>Contact</h3>
-        <p><strong>LinkedIn:</strong>
-          <a class="about-link" href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank" rel="noopener noreferrer">
-            Giuseppe Sansone
-          </a>
-        </p>
-      </div>
-    </div>
+  <div class="actions">
+    <button id="playBtn">Play</button>
+    <button id="resetBtn">Reset</button>
+    <button id="mirrorBtn">Mirror</button>
+    <button id="fullBtn">Fullscreen</button>
   </div>
 
-  <div id="presentOverlay" class="present hidden" aria-label="Present mode">
-    <div class="present-controls">
-      <button id="pMode" class="btn primary" type="button">Play</button>
-      <button id="pReset" class="btn secondary" type="button">Reset</button>
-      <button id="pExit" class="btn danger" type="button">Exit</button>
+  <div class="meta">
+    <span>© Sansone 2026</span>
+    <button id="aboutBtn" class="link">About</button>
+  </div>
+</header>
 
-      <div class="mini">
-        <span class="tag">Speed</span>
-        <input id="pSpeed" type="range" min="5" max="200" value="60" />
-        <span id="pSpeedVal" class="mono">60</span>
-      </div>
+<main class="main">
+  <div class="controls">
+    <label>
+      Speed
+      <input type="range" id="speed" min="10" max="200" value="60">
+    </label>
 
-      <div class="mini">
-        <span class="tag">Text</span>
-        <input id="pFont" type="range" min="18" max="96" value="56" />
-        <span id="pFontVal" class="mono">56</span>
-      </div>
+    <label>
+      Text
+      <input type="range" id="size" min="18" max="72" value="40">
+    </label>
 
-      <button id="pMirror" class="btn secondary" type="button">Mirror</button>
-    </div>
-
-    <div class="present-view" id="presentView">
-      <div id="presentScrollLayer" class="present-scroll-layer">
-        <div id="presentScript" class="present-script"></div>
-      </div>
-    </div>
+    <label>
+      Align
+      <select id="align">
+        <option value="left">Left</option>
+        <option value="center" selected>Center</option>
+        <option value="right">Right</option>
+      </select>
+    </label>
   </div>
 
+  <div id="viewer">
+    <div id="script" contenteditable="true"></div>
+  </div>
+</main>
+
+<!-- ABOUT -->
+<div id="about" class="modal hidden">
+  <div class="modal-box">
+    <h2>About CueFlow</h2>
+
+    <p><strong>I built CueFlow because I needed a simple, clean teleprompter that matched the way I work.</strong>
+    I tried several tools, but none had the exact features and workflow I wanted.</p>
+
+    <p>So I built the teleprompter I wanted to use:
+    <strong>fast, distraction-free, and designed to work smoothly.</strong></p>
+
+    <p><strong>CueFlow is free and will stay free.</strong>
+    If it helps you, feel free to share it with your community.</p>
+
+    <h3>Privacy</h3>
+    <p>Your text is not saved and not sent anywhere. Refreshing the page clears everything.</p>
+
+    <h3>Acceptable Use</h3>
+    <ul>
+      <li>Illegal content or activities</li>
+      <li>Fraud, scams, impersonation</li>
+      <li>Hate, violence, discrimination</li>
+      <li>Terrorism or criminal activity</li>
+      <li>Copyright or privacy violations</li>
+    </ul>
+
+    <h3>Contact</h3>
+    <p>
+      <a href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank">
+        Giuseppe Sansone (LinkedIn)
+      </a>
+    </p>
+
+    <button id="closeAbout">Close</button>
+  </div>
 </div>
 
-<script src="app.js?v=9"></script>
+<script src="app.js?v=1"></script>
 </body>
 </html>
+
