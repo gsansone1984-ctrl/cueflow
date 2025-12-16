@@ -20,6 +20,10 @@ body{
 
 .hidden{ display:none !important; }
 
+/* HARD-KILL any old fade-in if cached somewhere */
+.fade-in, .viewer-wrap.fade-in, .present.fade-in { animation:none !important; }
+.viewer-wrap.fade-in .scroll-layer, .present.fade-in .present-scroll-layer { animation:none !important; }
+
 #appRoot{
   min-height:100vh;
   display:flex;
@@ -229,16 +233,12 @@ body.site-mirrored #appRoot{
 .viewer-wrap.mirrored{ transform:scaleX(-1); transform-origin:center; }
 .viewer{
   height:100%;
-  min-height:60vh;  /* BIG paste area */
+  min-height:60vh;
   overflow:hidden;
   position:relative;
   background:#000;
 }
-.scroll-layer{
-  position:absolute;
-  inset:0;
-  will-change:transform;
-}
+.scroll-layer{ position:absolute; inset:0; will-change:transform; }
 
 /* SCRIPT */
 .script{
@@ -271,16 +271,12 @@ body.site-mirrored #appRoot{
   pointer-events:none;
 }
 
-/* ABOUT MODAL */
+/* ABOUT */
 .modal{
-  position:fixed;
-  inset:0;
+  position:fixed; inset:0;
   background:rgba(0,0,0,.65);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:2000;
-  padding:16px;
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000; padding:16px;
 }
 .modal.hidden{ display:none !important; }
 .modal-card{
@@ -293,11 +289,8 @@ body.site-mirrored #appRoot{
   padding:12px;
 }
 .modal-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding-bottom:8px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; padding-bottom:8px;
   border-bottom:1px solid rgba(255,255,255,.10);
 }
 .modal-title{ color:var(--accent); font-weight:900; }
