@@ -16,7 +16,6 @@ body{
   color:var(--fg);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
 }
-
 .hidden{ display:none !important; }
 
 /* TOPBAR */
@@ -31,12 +30,10 @@ body{
   z-index:10;
   background:#000;
 }
-
 .brand{ display:flex; align-items:center; }
 .brand-logo{ width:40px; height:40px; }
 
 .actions{ display:flex; gap:10px; align-items:center; }
-
 .right{ display:flex; align-items:center; gap:12px; }
 .meta{
   display:flex;
@@ -83,7 +80,7 @@ body{
 .btn.tiny{ padding:8px 10px; border-radius:12px; font-size:12px; }
 .btn.chip{ background:rgba(255,255,255,.06); color:#fff; }
 
-/* MENU (mobile) */
+/* Mobile menu */
 .menu-btn{
   display:none;
   border:1px solid var(--border);
@@ -121,7 +118,7 @@ body{
 .menu-item.btn-primary{ color:var(--accent); }
 .menu-sep{ height:1px; background:rgba(255,255,255,.10); margin:4px 2px; }
 
-/* MAIN */
+/* Main */
 .main{
   padding:14px;
   display:flex;
@@ -129,14 +126,12 @@ body{
   gap:12px;
   min-height:calc(100vh - 70px);
 }
-
 .controls{
   display:flex;
   flex-wrap:wrap;
   gap:12px;
   align-items:center;
 }
-
 .ctrl{
   display:flex;
   align-items:center;
@@ -176,12 +171,9 @@ body{
 .fmt-group{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .fmt-label{ font-size:12px; color:var(--muted); margin-right:4px; }
 
-.hint{
-  font-size:12px;
-  color:var(--muted);
-}
+.hint{ font-size:12px; color:var(--muted); }
 
-/* VIEWER */
+/* Viewer */
 .viewer{
   flex:1 1 auto;
   min-height:60vh;
@@ -192,13 +184,44 @@ body{
   background:#000;
 }
 
-/* Editor is stationary (paste-safe) */
+/* Editor scrollable */
 .editor, .player{
   position:absolute;
   inset:0;
 }
-.editor{ z-index:2; }
+.editor{
+  z-index:2;
+  overflow:auto;                 /* <-- SCROLL EDITOR */
+  -webkit-overflow-scrolling:touch;
+  padding:0;                     /* padding is on inner editor */
+}
 .player{ z-index:3; }
+
+.editor-script{
+  min-height:100%;
+  padding:36px 22px 220px;
+  font-size:40px;
+  line-height:1.35;
+  text-align:center;
+  outline:none;
+  color:#fff;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+/* Placeholder */
+.editor-script:empty::before{
+  content:"Paste your script here…";
+  display:block;
+  width:100%;
+  margin-top:30vh;
+  text-align:center;
+  color:rgba(255,255,255,.35);
+  font-weight:900;
+  font-size:30px;
+  pointer-events:none;
+}
 
 /* Player scroll */
 .scroll-layer{
@@ -216,37 +239,20 @@ body{
   transform-origin:center;
 }
 
-/* SCRIPT shared */
-.script{
+.player-script{
   position:absolute;
   inset:0;
   padding:36px 22px 220px;
   font-size:40px;
   line-height:1.35;
   text-align:center;
-  outline:none;
-  color:#fff;
   white-space:pre-wrap;
   overflow-wrap:anywhere;
   word-break:break-word;
+  color:#fff;
 }
 
-/* Placeholder only for editor */
-.editor-script:empty::before{
-  content:"Paste your script here…";
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  width:90%;
-  text-align:center;
-  color:rgba(255,255,255,.35);
-  font-weight:900;
-  font-size:30px;
-  pointer-events:none;
-}
-
-/* ABOUT MODAL */
+/* About */
 .modal{
   position:fixed;
   inset:0;
@@ -280,7 +286,27 @@ body{
 .about-link{ color:var(--accent); font-weight:900; text-decoration:none; }
 .about-link:hover{ text-decoration:underline; }
 
-/* PRESENT MODE */
+.about-hero{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:10px;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+}
+.about-photo{
+  width:64px;
+  height:64px;
+  border-radius:16px;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,.14);
+}
+.about-name .name{ font-weight:900; color:var(--accent); }
+.about-name .role{ font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* Present mode */
 .present{
   position:fixed;
   inset:0;
@@ -328,10 +354,10 @@ body{
   color:#fff;
 }
 
-/* RESPONSIVE */
+/* Responsive */
 @media (max-width: 980px){
   .desktop-actions{ display:none; }
   .menu-btn{ display:inline-flex; }
   .viewer{ min-height:65vh; }
-  .script{ font-size:34px; }
+  .editor-script, .player-script{ font-size:34px; }
 }
