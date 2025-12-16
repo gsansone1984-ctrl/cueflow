@@ -68,17 +68,6 @@ let y = 0;
 let presentY = 0;
 let lastTs = null;
 
-function triggerFadeMain(){
-  viewerWrap.classList.remove("fade-in");
-  void viewerWrap.offsetWidth;
-  viewerWrap.classList.add("fade-in");
-}
-function triggerFadePresent(){
-  presentOverlay.classList.remove("fade-in");
-  void presentOverlay.offsetWidth;
-  presentOverlay.classList.add("fade-in");
-}
-
 /* menu */
 function openMobileMenu(){
   mobileMenu.classList.remove("hidden");
@@ -170,14 +159,9 @@ function play(){
   if(isPlaying) return;
   isPlaying = true;
 
-  // lock editing while playing
   script.setAttribute("contenteditable","false");
-
   syncPresent();
   setModeLabels();
-
-  triggerFadeMain();
-  if(!presentOverlay.classList.contains("hidden")) triggerFadePresent();
 
   rafId = requestAnimationFrame(tick);
 }
@@ -188,7 +172,6 @@ function pause(){
   rafId = null;
   lastTs = null;
 
-  // unlock editing
   script.setAttribute("contenteditable","true");
   setModeLabels();
 }
@@ -258,8 +241,6 @@ function openPresent(){
 
   closeMobileMenu();
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
-
-  triggerFadePresent();
 }
 
 function closePresent(){
@@ -390,7 +371,6 @@ function init(){
   setModeLabels();
   requestAnimationFrame(() => { clampScroll(); applyScroll(); });
 }
-
 init();
 
 
