@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CueFlow — Teleprompter</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=9" />
 </head>
 <body>
 <div id="appRoot">
@@ -75,9 +75,9 @@
 
       <div class="formatbar">
         <div class="format-left">
-          <button class="btn tiny" id="fmtBold" type="button" title="Bold">B</button>
-          <button class="btn tiny" id="fmtItalic" type="button" title="Italic">I</button>
-          <button class="btn tiny" id="fmtUnderline" type="button" title="Underline">U</button>
+          <button class="btn tiny" id="fmtBold" type="button">B</button>
+          <button class="btn tiny" id="fmtItalic" type="button">I</button>
+          <button class="btn tiny" id="fmtUnderline" type="button">U</button>
         </div>
 
         <div class="format-group">
@@ -107,8 +107,7 @@
     </section>
   </main>
 
-  <!-- ABOUT MODAL -->
-  <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About">
+  <div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card">
       <div class="modal-head">
         <div class="modal-title">About</div>
@@ -116,28 +115,20 @@
       </div>
 
       <div class="modal-body">
-        <p>
-          <strong>I built CueFlow because I needed a simple, clean teleprompter that matched the way I work.</strong>
-          I tried several tools, but none had the exact features and workflow I was looking for.
-        </p>
+        <p><strong>I built CueFlow because I needed a simple, clean teleprompter that matched the way I work.</strong>
+        I tried several tools, but none had the exact features and workflow I was looking for.</p>
 
-        <p>
-          So I built the teleprompter I wanted to use:
-          <strong>fast, distraction-free, and designed to work smoothly</strong>.
-        </p>
+        <p>So I built the teleprompter I wanted to use:
+        <strong>fast, distraction-free, and designed to work smoothly</strong>.</p>
 
-        <p>
-          <strong>CueFlow is free and will stay free.</strong>
-          If it helps you, feel free to share it with your community.
-        </p>
+        <p><strong>CueFlow is free and will stay free.</strong>
+        If it helps you, feel free to share it with your community.</p>
 
         <hr class="about-hr" />
 
         <h3>Privacy</h3>
-        <p>
-          Your text is <strong>not saved</strong>, <strong>not tracked</strong>, and <strong>not sent anywhere</strong>.
-          Refreshing the page clears everything.
-        </p>
+        <p>Your text is <strong>not saved</strong>, <strong>not tracked</strong>, and <strong>not sent anywhere</strong>.
+        Refreshing the page clears everything.</p>
 
         <hr class="about-hr" />
 
@@ -162,8 +153,7 @@
         <hr class="about-hr" />
 
         <h3>Contact</h3>
-        <p>
-          <strong>LinkedIn:</strong>
+        <p><strong>LinkedIn:</strong>
           <a class="about-link" href="https://www.linkedin.com/in/sansonegiuseppe/" target="_blank" rel="noopener noreferrer">
             Giuseppe Sansone
           </a>
@@ -172,7 +162,6 @@
     </div>
   </div>
 
-  <!-- PRESENT OVERLAY -->
   <div id="presentOverlay" class="present hidden" aria-label="Present mode">
     <div class="present-controls">
       <button id="pMode" class="btn primary" type="button">Play</button>
@@ -203,6 +192,6 @@
 
 </div>
 
-<script src="app.js"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>
