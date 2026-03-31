@@ -59,12 +59,14 @@
           <div class="dj-label">Speed</div>
           <input type="range" id="speed" min="0" max="220" value="0" />
           <div id="speedVal" class="dj-value">0</div>
+          <div class="led-bar" id="speedLeds" aria-hidden="true"></div>
         </div>
 
         <div class="dj-control">
           <div class="dj-label">Text</div>
           <input type="range" id="size" min="18" max="72" value="40" />
           <div id="sizeVal" class="dj-value">40</div>
+          <div class="led-bar" id="sizeLeds" aria-hidden="true"></div>
         </div>
       </div>
 
@@ -254,16 +256,18 @@
       <button id="pMirrorBtn" class="btn" type="button">Mirror</button>
       <button id="pExitBtn" class="btn" type="button">Exit</button>
 
-      <div class="p-ctrl">
+      <div class="p-ctrl p-dj-control">
         <span>Speed</span>
         <input id="pSpeed" type="range" min="0" max="220" value="0" />
         <span id="pSpeedVal" class="val">0</span>
+        <div class="led-bar" id="pSpeedLeds" aria-hidden="true"></div>
       </div>
 
-      <div class="p-ctrl">
+      <div class="p-ctrl p-dj-control">
         <span>Text</span>
         <input id="pSize" type="range" min="18" max="96" value="56" />
         <span id="pSizeVal" class="val">56</span>
+        <div class="led-bar" id="pSizeLeds" aria-hidden="true"></div>
       </div>
     </div>
 

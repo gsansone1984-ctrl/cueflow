@@ -415,55 +415,55 @@ body{
   outline-offset: 2px;
 }
 
-/* DJ Console */
+/* DJ-style controls with LED meters */
 .dj-console{
   display:flex;
   gap:16px;
-  align-items:center;
+  align-items:stretch;
   padding:10px 14px;
   border:1px solid var(--border);
   border-radius:16px;
   background:rgba(255,255,255,.02);
 }
-
 .dj-control{
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
   gap:6px;
-  min-width:120px;
+  min-width:128px;
 }
-
 .dj-label{
   font-size:11px;
   letter-spacing:1px;
   text-transform:uppercase;
   color:var(--muted);
 }
-
 .dj-value{
   font-size:14px;
   font-weight:900;
   color:var(--accent);
+  min-width:24px;
+  text-align:center;
 }
-
-.dj-control input[type="range"]{
+.dj-control input[type="range"],
+.p-dj-control input[type="range"]{
   -webkit-appearance:none;
   appearance:none;
   width:140px;
   height:4px;
-  background:rgba(255,255,255,.15);
-  border-radius:2px;
+  background:rgba(255,255,255,.18);
+  border-radius:999px;
   outline:none;
 }
-
-.dj-control input[type="range"]::-webkit-slider-runnable-track{
+.dj-control input[type="range"]::-webkit-slider-runnable-track,
+.p-dj-control input[type="range"]::-webkit-slider-runnable-track{
   height:4px;
   background:rgba(255,255,255,.2);
-  border-radius:2px;
+  border-radius:999px;
 }
-
-.dj-control input[type="range"]::-webkit-slider-thumb{
+.dj-control input[type="range"]::-webkit-slider-thumb,
+.p-dj-control input[type="range"]::-webkit-slider-thumb{
   -webkit-appearance:none;
   appearance:none;
   width:14px;
@@ -474,36 +474,50 @@ body{
   cursor:pointer;
   box-shadow:0 0 6px rgba(255,212,0,.6);
 }
-
-.dj-control input[type="range"]::-moz-range-track{
+.dj-control input[type="range"]::-moz-range-track,
+.p-dj-control input[type="range"]::-moz-range-track{
   height:4px;
   background:rgba(255,255,255,.2);
-  border-radius:2px;
+  border-radius:999px;
 }
-
-.dj-control input[type="range"]::-moz-range-thumb{
+.dj-control input[type="range"]::-moz-range-thumb,
+.p-dj-control input[type="range"]::-moz-range-thumb{
   width:14px;
   height:14px;
   background:var(--accent);
   border:none;
   border-radius:50%;
-  cursor:pointer;
   box-shadow:0 0 6px rgba(255,212,0,.6);
+}
+
+.led-bar{
+  display:flex;
+  gap:4px;
+  margin-top:4px;
+}
+.led{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+  transition:all .2s ease;
+}
+.led.active{
+  background:var(--led-color);
+  box-shadow:0 0 6px var(--led-color);
+}
+
+.p-dj-control{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
 }
 
 @media (max-width: 980px){
   .dj-console{
     width:100%;
-    justify-content:space-between;
+    justify-content:flex-start;
     flex-wrap:wrap;
-  }
-
-  .dj-control{
-    min-width:unset;
-    flex:1 1 140px;
-  }
-
-  .dj-control input[type="range"]{
-    width:100%;
   }
 }
