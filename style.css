@@ -414,3 +414,96 @@ body{
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* DJ Console */
+.dj-console{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  padding:10px 14px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:rgba(255,255,255,.02);
+}
+
+.dj-control{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  min-width:120px;
+}
+
+.dj-label{
+  font-size:11px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.dj-value{
+  font-size:14px;
+  font-weight:900;
+  color:var(--accent);
+}
+
+.dj-control input[type="range"]{
+  -webkit-appearance:none;
+  appearance:none;
+  width:140px;
+  height:4px;
+  background:rgba(255,255,255,.15);
+  border-radius:2px;
+  outline:none;
+}
+
+.dj-control input[type="range"]::-webkit-slider-runnable-track{
+  height:4px;
+  background:rgba(255,255,255,.2);
+  border-radius:2px;
+}
+
+.dj-control input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:14px;
+  height:14px;
+  background:var(--accent);
+  border-radius:50%;
+  margin-top:-5px;
+  cursor:pointer;
+  box-shadow:0 0 6px rgba(255,212,0,.6);
+}
+
+.dj-control input[type="range"]::-moz-range-track{
+  height:4px;
+  background:rgba(255,255,255,.2);
+  border-radius:2px;
+}
+
+.dj-control input[type="range"]::-moz-range-thumb{
+  width:14px;
+  height:14px;
+  background:var(--accent);
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  box-shadow:0 0 6px rgba(255,212,0,.6);
+}
+
+@media (max-width: 980px){
+  .dj-console{
+    width:100%;
+    justify-content:space-between;
+    flex-wrap:wrap;
+  }
+
+  .dj-control{
+    min-width:unset;
+    flex:1 1 140px;
+  }
+
+  .dj-control input[type="range"]{
+    width:100%;
+  }
+}
