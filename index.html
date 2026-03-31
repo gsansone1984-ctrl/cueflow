@@ -3,9 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CueFlow</title>
+  <title>Cue-Flow.app – Free Privacy-First Teleprompter</title>
+  <meta property="og:title" content="Cue-Flow.app" />
+<meta property="og:description" content="A simple, privacy-first teleprompter. Free forever and designed to support charitable causes." />
+<meta property="og:image" content="https://www.cue-flow.app/cue-flow_logo.jpg" />
+<meta property="og:url" content="https://www.cue-flow.app/" />
+<meta property="og:type" content="website" />
+  <meta name="description" content="Cue-Flow is a free, privacy-first online teleprompter designed for focused creators. No tracking, no saving, free forever." />
+
+
   <link rel="stylesheet" href="style.css?v=5" />
-</head>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="e763de89-73a4-40d8-af30-10a510de5d15"></script>
+  </head>
 
 <body>
   <header class="topbar">
@@ -67,6 +76,17 @@
       </label>
 
       <button id="clearBtn" class="btn danger" type="button">Clear</button>
+      <button id="importBtn" class="btn secondary" type="button">
+  Import TXT / DOCX
+</button>
+
+<input
+  id="importFile"
+  type="file"
+  accept=".txt,.docx"
+  class="hidden"
+/>
+
     </div>
 
     <div class="formatbar" aria-label="Formatting">
@@ -76,12 +96,14 @@
         <button id="fmtUnderline" class="btn tiny" type="button">U</button>
       </div>
 
-      <div class="fmt-group">
-        <span class="fmt-label">Text</span>
-        <button id="tcYellow" class="btn tiny chip" type="button">Yellow</button>
-        <button id="tcGreen" class="btn tiny chip" type="button">Green</button>
-        <button id="tcReset" class="btn tiny secondary" type="button">Reset</button>
-      </div>
+<div class="fmt-group">
+  <span class="fmt-label">Text</span>
+  <button id="tcYellow" class="btn tiny chip" type="button">Yellow</button>
+  <button id="tcGreen" class="btn tiny chip" type="button">Green</button>
+  <button id="tcRed" class="btn tiny chip" type="button">Red</button>
+  <button id="tcClear" class="btn tiny secondary" type="button">Clear</button>
+</div>
+
 
       <div class="fmt-group">
         <span class="fmt-label">Highlight</span>
@@ -173,47 +195,51 @@
 
 <h3>Support CueFlow</h3>
 
-<p>
-  CueFlow is free and will always be free.
-</p>
+<a href="https://www.buymeacoffee.com/cueflowapp" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+
+
+       <h3>Contact</h3>
 
 <p>
-  If you find it useful, you can support the project with an optional donation.
-</p>
-
-<p>
-  Donations help support the development of CueFlow and also contribute to
-  charitable initiatives.
-</p>
-
-<p style="text-align:center; margin-top:18px;">
-  <a
-    href="https://paypal.me/gsansone1984"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Support CueFlow on PayPal"
-  >
-    <img
-      src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
-      alt="PayPal"
-      style="height:38px;"
-    />
+  <a class="about-link" href="mailto:info@cue-flow.app">
+    info@cue-flow.app
   </a>
 </p>
 
+<p>
+  <a
+    class="about-link"
+    href="https://www.linkedin.com/company/cue-flow/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    LinkedIn — CueFlow
+  </a>
+</p>
 
+<p>
+  <a
+    class="about-link"
+    href="https://www.instagram.com/cue_flow.app/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Instagram — @cue_flow.app
+  </a>
+</p>
 
-        <h3>Contact</h3>
-        <p>
-          <a
-            class="about-link"
-            href="https://www.linkedin.com/in/sansonegiuseppe/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Giuseppe Sansone (LinkedIn)
-          </a>
-        </p>
+<p>
+  <a
+    class="about-link"
+    href="https://www.linkedin.com/in/sansonegiuseppe/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Giuseppe Sansone — LinkedIn
+  </a>
+</p>
+
       </div>
     </div>
   </div>
@@ -247,10 +273,7 @@
       </div>
     </div>
   </div>
-
-  <script src="app.js?v=5"></script>
+<script src="https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
-
-
-

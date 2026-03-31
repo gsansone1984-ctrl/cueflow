@@ -15,6 +15,9 @@ const size = $("size");
 const sizeVal = $("sizeVal");
 const align = $("align");
 const clearBtn = $("clearBtn");
+const importBtn = $("importBtn");
+const importFile = $("importFile");
+
 
 /* Desktop actions */
 const playBtn = $("playBtn");
@@ -39,7 +42,8 @@ const fmtItalic = $("fmtItalic");
 const fmtUnderline = $("fmtUnderline");
 const tcYellow = $("tcYellow");
 const tcGreen = $("tcGreen");
-const tcReset = $("tcReset");
+const tcRed = $("tcRed");
+const tcClear = $("tcClear");
 const hlBlue = $("hlBlue");
 const hlPink = $("hlPink");
 const hlClear = $("hlClear");
@@ -154,6 +158,100 @@ editor.addEventListener("scroll", () => {
   applyTransforms();
 });
 
+/* Manual seek (wheel + drag) in PLAYER + PRESENT */
+const WHEEL_FACTOR = 1.0; // 0.7 slower, 1.3 faster
+const DRAG_FACTOR  = 1.2;
+
+function isPlayerVisible(){
+  return !player.classList.contains("hidden");
+}
+
+function nudgeScroll(deltaPx){
+  y += deltaPx;
+  clampScroll();
+  applyTransforms();
+  lastTs = null; // avoid jumps when resuming
+}
+
+// Present: move in present pixels to avoid amplified jumps, then sync y
+function nudgePresent(deltaPx){
+  const vh = viewer.clientHeight || 1;
+  const start = startOffset(viewer, 80);
+  const total = scriptPlayer.scrollHeight + start;
+  const maxY = Math.max(0, total - vh + 60);
+
+  const pH = pViewer.clientHeight || 1;
+  const pStart = startOffset(pViewer, 140);
+  const pTotal = pScript.scrollHeight + pStart;
+  const pMax = Math.max(0, pTotal - pH + 120);
+
+  pY += deltaPx;
+  pY = Math.min(Math.max(pY, 0), pMax);
+
+  y = (pMax === 0) ? 0 : (pY / pMax) * maxY;
+  y = Math.min(Math.max(y, 0), maxY);
+
+  applyTransforms();
+  lastTs = null;
+}
+
+// Wheel / trackpad in PLAYER
+viewer.addEventListener("wheel", (e) => {
+  if(!isPlayerVisible()) return;
+  e.preventDefault();
+  nudgeScroll(e.deltaY * WHEEL_FACTOR);
+}, { passive: false });
+
+// Wheel / trackpad in PRESENT
+pViewer.addEventListener("wheel", (e) => {
+  if(!isPresentOpen()) return;
+  e.preventDefault();
+  nudgePresent(e.deltaY * WHEEL_FACTOR);
+}, { passive: false });
+
+// Drag in PLAYER
+let dragging = false;
+let lastClientY = 0;
+
+viewer.addEventListener("pointerdown", (e) => {
+  if(!isPlayerVisible()) return;
+  dragging = true;
+  lastClientY = e.clientY;
+  viewer.setPointerCapture(e.pointerId);
+});
+
+viewer.addEventListener("pointermove", (e) => {
+  if(!dragging) return;
+  const dy = e.clientY - lastClientY;
+  lastClientY = e.clientY;
+  nudgeScroll(-dy * DRAG_FACTOR);
+});
+
+viewer.addEventListener("pointerup", () => { dragging = false; });
+viewer.addEventListener("pointercancel", () => { dragging = false; });
+
+// Drag in PRESENT
+let pDragging = false;
+let pLastClientY = 0;
+
+pViewer.addEventListener("pointerdown", (e) => {
+  if(!isPresentOpen()) return;
+  pDragging = true;
+  pLastClientY = e.clientY;
+  pViewer.setPointerCapture(e.pointerId);
+});
+
+pViewer.addEventListener("pointermove", (e) => {
+  if(!pDragging) return;
+  const dy = e.clientY - pLastClientY;
+  pLastClientY = e.clientY;
+  nudgePresent(-dy * DRAG_FACTOR);
+});
+
+pViewer.addEventListener("pointerup", () => { pDragging = false; });
+pViewer.addEventListener("pointercancel", () => { pDragging = false; });
+
+
 /* Play */
 function pxPerSec(){ return Number(speed.value) * 6; }
 
@@ -236,6 +334,7 @@ function openPresent(){
   pScript.style.fontSize = `${pSize.value}px`;
 
   presentOverlay.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
   pViewer.classList.toggle("mirrored", viewer.classList.contains("mirrored"));
 
   // align present with current position
@@ -243,7 +342,7 @@ function openPresent(){
   applyTransforms();
 }
 
-function closePresent(){ presentOverlay.classList.add("hidden"); }
+function closePresent(){ presentOverlay.classList.add("hidden"); document.body.style.overflow = ""; }
 
 /* Clear */
 function clearAll(){
@@ -340,9 +439,11 @@ fmtBold.onclick = () => exec("bold");
 fmtItalic.onclick = () => exec("italic");
 fmtUnderline.onclick = () => exec("underline");
 
-tcYellow.onclick = () => setTextColor("#FFD400");
-tcGreen.onclick = () => setTextColor("#00FF7B");
-tcReset.onclick = () => setTextColor("#FFFFFF");
+tcYellow.onclick = () => setTextColor("#FFD400"); // Yellow
+tcGreen.onclick  = () => setTextColor("#00FF7B"); // Green
+tcRed.onclick    = () => setTextColor("#FF3B30"); // Red
+tcClear.onclick  = () => setTextColor("#FFFFFF"); // Clear (white)
+
 
 hlBlue.onclick = () => setHighlight("#4F7CFF");
 hlPink.onclick = () => setHighlight("#FF4FD8");
@@ -397,3 +498,44 @@ window.addEventListener("load", () => {
 window.addEventListener("resize", () => {
   requestAnimationFrame(() => { clampScroll(); applyTransforms(); });
 });
+
+// IMPORT TXT / DOCX (client-side only)
+importBtn.onclick = () => importFile.click();
+
+importFile.onchange = async () => {
+  const file = importFile.files[0];
+  if (!file) return;
+
+  const ext = file.name.split(".").pop().toLowerCase();
+
+  try {
+    if (ext === "txt") {
+      const text = await file.text();
+      loadImportedText(text);
+    }
+
+    if (ext === "docx") {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      loadImportedText(result.value || "");
+    }
+  } catch (err) {
+    alert("Unable to import this file.");
+    console.error(err);
+  }
+
+  importFile.value = "";
+};
+
+function loadImportedText(text) {
+  scriptEditor.innerText = text;
+
+  // reset positions
+  y = 0;
+  pY = 0;
+  lastTs = null;
+
+  editor.scrollTop = 0;
+
+  applyTransforms();
+}

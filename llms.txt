@@ -1,0 +1,31 @@
+# Cue-Flow
+
+> Cue-Flow is a free, privacy-first teleprompter that runs locally in your browser.
+> No accounts. No tracking. No saved data. Refreshing the page clears everything.
+> Optional donations support the project and contribute to charitable causes with transparency.
+
+## Main application
+
+- https://cue-flow.app/
+  The main Cue-Flow web app including the editor, teleprompter, mirror mode,
+  present mode, and all controls.
+
+## About, Privacy, Terms, Support
+
+All informational sections (About, Privacy, Terms of Use, Support Cue-Flow,
+and Contacts) are included within the main page interface.
+
+## Key facts
+
+- Runs entirely in the browser
+- User text is never stored or transmitted
+- Designed for focused creators and presenters
+- Free to use with optional donations
+- Donations support the project and charitable causes
+
+## Contacts
+
+- LinkedIn Company: https://www.linkedin.com/company/cue-flow/
+- Instagram: https://www.instagram.com/cue_flow.app/
+- Founder LinkedIn: https://www.linkedin.com/in/sansonegiuseppe/
+- Email: info@cue-flow.app

@@ -210,18 +210,34 @@ body{
   word-break:break-word;
 }
 
-/* Placeholder */
-.editor-script:empty::before{
-  content:"Paste your script here…";
-  display:block;
-  width:100%;
-  margin-top:30vh;
-  text-align:center;
-  color:rgba(255,255,255,.35);
-  font-weight:900;
-  font-size:30px;
-  pointer-events:none;
+/* Placeholder main line */
+.editor-script:empty::before {
+  content: "Paste your text here…";
+  display: block;
+  width: 100%;
+  margin-top: 30vh;
+  text-align: center;
+  color: rgba(255,255,255,0.35);
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1.4;
+  pointer-events: none;
 }
+
+/* Placeholder secondary line (accent) */
+.editor-script:empty::after {
+  content: "If Cue-Flow is useful to you, share it with your network or community.";
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  text-align: center;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+
 
 /* Player scroll */
 .scroll-layer{
@@ -360,4 +376,41 @@ body{
   .menu-btn{ display:inline-flex; }
   .viewer{ min-height:65vh; }
   .editor-script, .player-script{ font-size:34px; }
+}
+
+/* About modal — titles & links */
+
+.modal-body h3 {
+  color: var(--accent); /* giallo Cue-Flow */
+  font-weight: 900;
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+
+/* Links in About (Contacts, ecc.) */
+.modal-body a.about-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Hover: sottolineatura discreta */
+.modal-body a.about-link:hover {
+  text-decoration: underline;
+}
+
+/* Import button: accent outline */
+#importBtn{
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* Hover / focus */
+#importBtn:hover{
+  filter: brightness(1.05);
+}
+#importBtn:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
